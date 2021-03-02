@@ -11,8 +11,8 @@ var body = $response.body
 //精品课程解锁                                                    
 body = body.replace(/"isBuyed":\w+/g,'"isBuyed":true')
 body = body.replace(/"buyed":\w+/g,'"buyed":true')
-body = body.replace(/"trial":\w+/g,'"trial":true')
-body = body.replace(/"free":\w+/g,'"free":true')
+//body = body.replace(/"trial":\w+/g,'"trial":true')
+//body = body.replace(/"free":\w+/g,'"free":true')
 body = body.replace(/"hasBuy":\d/g,'"hasBuy":1')
 
 $done({body});      
