@@ -12,6 +12,7 @@
  * 下载这个js到本地Script下面
  * 再去复制一下内容到对应的配置
  *
+ * https://raw.githubusercontent.com/Gx3dong/Surge/master/JS/xjsp.js
  * [rewrite_local]
  * # > 会员
  * https:\/\/.*\.*apps.com url request-header Cookie:.+ request-header Cookie: xxx_api_auth=3731653137633361383863653938346662393462333535383638663231346362
