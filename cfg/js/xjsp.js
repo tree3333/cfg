@@ -51,6 +51,8 @@ if ($request.url.indexOf("/getGlobalData") != -1){
 if ($request.url.indexOf("/init") != -1){
   delete obj.data.adgroups;
   delete obj.data.iOS_adgroups;
+  delete obj.data.globalData.iOS_adgroups;
+  delete obj.data.globalData.adgroups;
 }
 if ($request.url.indexOf("/reqplay/") != -1){
   obj.retcode = "0";
