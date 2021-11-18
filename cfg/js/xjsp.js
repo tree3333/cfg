@@ -48,9 +48,7 @@ if ($request.url.indexOf("/getGlobalData") != -1){
   delete obj.data.adgroups;
   delete obj.data.iOS_adgroups;
 }
-if ($request.url.indexOf("/init") != -1){
-  delete obj.data.adgroups;
-  delete obj.data.iOS_adgroups;
+if ($request.url.indexOf("//init") != -1){
   delete obj.data.globalData.iOS_adgroups;
   delete obj.data.globalData.adgroups;
 }
