@@ -45,7 +45,6 @@ http://192.168.10.30:4022/udp/239.93.42.50:5140
 http://192.168.10.30:4022/udp/239.93.42.51:5140
 #EXTINF:-1 tvg-id="20" tvg-name="CGTN" tvg-logo="http://epg.51zmt.top:8000/tb1/CCTV/cgtn.png" group-title="央视",CGTN俄罗斯语
 http://192.168.10.30:4022/udp/239.93.42.52:5140
-
 #EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="http://epg.51zmt.top:8000/tb1/sheng/aishang4k.png" group-title="四川",爱上4K(4K机顶盒用户可观看)
 http://192.168.10.30:4022/udp/239.93.0.97:5140
 #EXTINF:-1 tvg-id="141" tvg-name="凤凰中文" tvg-logo="http://epg.51zmt.top:8000/tb1/gt/fenghuangzhongwen.png" group-title="港澳台",凤凰中文台1
@@ -66,7 +65,6 @@ http://192.168.10.30:4022/rtp/239.93.0.156:2193
 http://192.168.10.30:4022/udp/239.93.1.104:1234
 #EXTINF:-1 tvg-id="7243" tvg-name="leshan" tvg-logo="" group-title="四川",爱乐山
 http://192.168.10.30:4022/udp/239.93.1.55:8302
-
 #EXTINF:-1 tvg-id="56" tvg-name="四川卫视" tvg-logo="http://epg.51zmt.top:8000/tb1/ws/sichuan.png" group-title="卫视",#EXTINF-1四川卫视高清
 http://192.168.10.30:4022/udp/239.93.0.169:5140
 #EXTINF:-1 tvg-id="27" tvg-name="湖南卫视" tvg-logo="http://epg.51zmt.top:8000/tb1/ws/hunan.png" group-title="卫视",#EXTINF-1湖南卫视高清
