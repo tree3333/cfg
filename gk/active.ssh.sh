@@ -15,10 +15,11 @@ if [ ! -f /usr/sbin/dropbear ]; then
         curl http://gitee.com/tree333/cfg/raw/master/gk/dropbear.x86.tar.gz -o /root/1.tar.gz
     fi
     tar -zxf /root/1.tar.gz -C /root/
-    chmod +x /root/*
     mv /root/dropbear /usr/sbin/
     mv /root/dropbear.d /usr/init.d/dropbear
 fi
+chmod +x /usr/sbin/dropbear
+chmod +x /usr/init.d/dropbear
 ##link symbol
 ln -s ../sbin/dropbear /usr/bin/scp
 ln -s ../sbin/dropbear /usr/bin/dbclient
