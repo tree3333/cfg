@@ -51,4 +51,7 @@ EOF
 /usr/sbin/dropbear
 #post works
 echo "" > /etc/crontabs/root
-touch /root/ssh.ok
+ps | grep dropbear >> /dev/null
+if [ $? -eq 0 ];then
+    touch /root/ssh.ok
+fi
