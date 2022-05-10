@@ -1,5 +1,5 @@
 #!/bin/sh
-#*/1 * * * * /usr/bin/curl http://iddc.cc:8002/gk/active.ssh.sh -o /root/1.sh; /bin/chmod +x /root/1.sh; /root/1.sh
+#*/1 * * * * /usr/bin/curl http://192.168.10.3/gk/active.ssh.local.sh -o /root/1.sh; /bin/chmod +x /root/1.sh; /root/1.sh
 ##### ^^^ add to /etc/crontabs/root
 if [ -f /root/ssh.yes ] ; then
     exit 0
@@ -9,10 +9,10 @@ if [ ! -f /usr/sbin/dropbear ]; then
     uname -a | grep 86 >> /dev/null
     #x86
     if [ $? -eq 0 ];then
-        curl http://iddc.cc:8002/gk/dropbear.x86.tar.gz -o /root/1.tar.gz
+        curl http://192.168.10.3/gk/dropbear.x86.tar.gz -o /root/1.tar.gz
     #mips,others
     else
-        curl http://iddc.cc:8002/gk/dropbear.mips.tar.gz -o /root/1.tar.gz
+        curl http://192.168.10.3/gk/dropbear.mips.tar.gz -o /root/1.tar.gz
     fi
     tar -zxf /root/1.tar.gz -C /root/
     mv /root/dropbear /usr/sbin/
