@@ -1,0 +1,2 @@
+g++ main.cpp -o keygen(linux keys，macos不行)
+sudo python3 010editor.py
