@@ -101,8 +101,8 @@ check_wanip(){
     if_sts=`ifconfig | sed "s/$/br/g"`
     if_sts=`echo $if_sts | grep -o "pppoe-[^ ]\+ Link encap:Point-to-Point Protocol br inet addr:[0-9.]\+" | awk '{print $1 $7}'` 
     ips=`echo $if_sts | sed "s/pppoe-//g" | sed "s/addr:/ /g"`
-    echo $ips > ~/hostat/ip_records
     if [ ! "${ips}"x = "${saved_ip}"x ]; then
+        echo $ips > ~/hostat/ip_records
         title="IP Changed"
         msg="New:${markdown_linefeed}${ips}${markdown_linefeed}Old:${markdown_linefeed}${saved_ip}"
         curl -k -s -X POST "http://sc.ftqq.com/${sckey}.send?text=${title}&" -d "desp=${msg}" > /dev/null
@@ -142,13 +142,14 @@ calc_bytes() {
     byte2=`unitG $byte2 $unit2`
     b=`awk 'BEGIN{print('$byte1'>'$byte2')?"1":"0"}'`
     if [ $b -eq 1 ];then
-        delta_bytes=`awk 'BEGIN{printf "%.1f\n",'$byte1'-'$byte2'}'`
+        delta_bytes=`awk 'BEGIN{printf "%.2f\n",'$byte1'-'$byte2'}'`
     else
         delta_bytes=$byte1
     fi
 }
 check_traffic() {
     yestorday_traffic=`cat ~/hostat/records`
+    cp ~/hostat/records ~/hostat/records.bak
     msg=""
     msg2=""
     host_num=0
@@ -163,20 +164,20 @@ check_traffic() {
         result=`echo $resp | grep -o "hostname[^{]\+${ip_addr},[^}]\+down_bytes:[0-9.]\+[MGTP]"`
         if [ $? -eq 0 ];then 
             #host is online
-	    host_num=$(($host_num+1))
+	    host_num=$((${host_num}+1))
             echo $result >> ~/hostat/records
             hostname=`get_para "hostname:" "$result" "[^,]\+"`
 	    ###calc up bytes
             up_bytes=`get_para "up_bytes:" "$result" "[^,]\+"`
             yes_up_bytes=`get_para "up_bytes:" "$yes_result" "[^,]\+"`
             calc_bytes ${up_bytes} ${yes_up_bytes}
-            total_up=`awk 'BEGIN{printf "%.1f\n",'$total_up'+'$delta_bytes'}'`
+            total_up=`awk 'BEGIN{printf "%.2f\n",'$total_up'+'$delta_bytes'}'`
 	    msg=$msg"${host_num}) ${hostname}(${ip_addr})${markdown_linefeed}上行: ${delta_bytes}G    " 
 	    #####calc down bytes
     	    down_bytes=`get_para "down_bytes:" "$result" "[^,]\+"`
     	    yes_down_bytes=`get_para "down_bytes:" "$yes_result" "[^,]\+"`
             calc_bytes ${down_bytes} ${yes_down_bytes}
-            total_down=`awk 'BEGIN{printf "%.1f\n",'$total_down'+'$delta_bytes'}'`
+            total_down=`awk 'BEGIN{printf "%.2f\n",'$total_down'+'$delta_bytes'}'`
 	    msg=$msg"下行: ${delta_bytes}G${markdown_linefeed}" 
 	    msg2=$msg2"${host_num}) ${hostname}(${ip_addr})${markdown_linefeed}上行: ${up_bytes}G    下行: ${down_bytes}G${markdown_linefeed}" 
         else
