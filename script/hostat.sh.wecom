@@ -19,7 +19,7 @@ sub_net=192.168.10
 mon_ip_list=50,51,52,53,10
 #检查状态间隔时间，单位为分
 sleep_time=5
-use_crontab=0
+use_crontab=1
 EOF
     exit 1
 fi

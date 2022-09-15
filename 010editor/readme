@@ -1,2 +1,20 @@
+https://www.sayers3.com/010editorcrack.html
+适用于最新的V10.0.2及之前的版本(12.0.1也行)，而且在Windows和macOS平台上通用。
 g++ main.cpp -o keygen(linux keys，macos不行)
 sudo python3 010editor.py
+
+将激活服务器域名指向本机
+Windows操作
+以管理员权限打开C:\Windows\System32\drivers\etc\hosts
+在hosts文件中添加如下一行内容：
+127.0.0.1 www.sweetscape.com
+macOS操作
+以sudo权限打开/private/etc/hosts文件：
+sudo vi /private/etc/hosts
+在hosts文件中添加一行如下内容：
+127.0.0.1 www.sweetscape.com
+激活010 Editor
+确保激活服务器域名已经指向本机，并且python脚本已经成功启动
+打开010 Editor的Register对话框，输入之前生成的用户名及激活码，点击Check License，即可激活成功。
+
+http://www.sweetscape.com/cgibin/010editor_check_license_9b.php?t=2978D20122&sum=6D3E80203CF85B59865F28F84C60FEB6159FB119D3B778D0&id=0&chk=26851&typ=0
