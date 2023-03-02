@@ -1,0 +1,4512 @@
+我给你们流，三大块，登录流、获取车信息流、控制车机流，填入你们直接的账户密码等信息应该就可以。
+登录流是获取权限和参数，
+获取车信息流是根据登录流的数据获取车辆状况信息、
+控制车机流是控制车机、解锁闭锁和找车鸣笛鸣闪。这三个流都是加载到nodered里运行的。
+获取正常就可以从nr流的打印中看到车辆数据和控制车机，我们再通过转化后就可以显示在ha的面板上直观显示。
+ha面板再通过卡片和主题美化后将枯燥的数据以好看的呈现方式呈现，比如我的这样
+
+[{
+	"id": "d87262d845988268",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "account填手机号；password填登录密码（请求体）",
+	"rules": [{
+		"t": "set",
+		"p": "payload",
+		"pt": "msg",
+		"to": "{\"password\":\"填写你的登录密码\",\"areaCode\":\"330383\",\"deviceId\":\"ffffffff-a1c9-c606-0000-000029b88992\",\"account\":\"填写你的账号即手机号\"}",
+		"tot": "json"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 610,
+	"y": 520,
+	"wires": [
+		["6a5ac11521d02bd1"]
+	]
+}, {
+	"id": "6a5ac11521d02bd1",
+	"type": "http request",
+	"z": "2e669a42b2ecf4d5",
+	"name": "欧拉R1登录",
+	"method": "POST",
+	"ret": "obj",
+	"paytoqs": "ignore",
+	"url": "https://marketing-api.gwm.com.cn:443/api-u/v1/user/auth/loginForPwd",
+	"tls": "",
+	"persist": false,
+	"proxy": "",
+	"authType": "",
+	"x": 870,
+	"y": 340,
+	"wires": [
+		["a424c79f8cda662f", "9eae74259d954713", "b93f130bde8cec2a", "b8807299545c6433", "cb6f161f1133388c", "14c725cb97483bc7", "9eca9455f4166ff9", "80978a08928de1fd"]
+	]
+}, {
+	"id": "c2e544882d56eb1f",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "HTTPS请求头设置",
+	"rules": [{
+		"t": "set",
+		"p": "headers.Secret",
+		"pt": "msg",
+		"to": "8bc742859a7849ec9a924c979afa5a00",
+		"tot": "str"
+	}, {
+		"t": "set",
+		"p": "headers.Authorization",
+		"pt": "msg",
+		"to": "",
+		"tot": "str"
+	}, {
+		"t": "set",
+		"p": "headers.Sign",
+		"pt": "msg",
+		"to": "Sign",
+		"tot": "msg"
+	}, {
+		"t": "set",
+		"p": "headers.AppId",
+		"pt": "msg",
+		"to": "GWM719278367448862",
+		"tot": "str"
+	}, {
+		"t": "set",
+		"p": "headers.SourceApp",
+		"pt": "msg",
+		"to": "ORA",
+		"tot": "str"
+	}, {
+		"t": "set",
+		"p": "headers.SourceType",
+		"pt": "msg",
+		"to": "ANDROID",
+		"tot": "str"
+	}, {
+		"t": "set",
+		"p": "headers.SourceAppVer",
+		"pt": "msg",
+		"to": "4.2.5",
+		"tot": "str"
+	}, {
+		"t": "set",
+		"p": "headers.TimeStamp",
+		"pt": "msg",
+		"to": "TimeStamp",
+		"tot": "msg"
+	}, {
+		"t": "set",
+		"p": "headers.Content-Type",
+		"pt": "msg",
+		"to": "application/json; charset=UTF-8",
+		"tot": "str"
+	}, {
+		"t": "set",
+		"p": "headers.Content-Length",
+		"pt": "msg",
+		"to": "117",
+		"tot": "str"
+	}, {
+		"t": "set",
+		"p": "headers.User-Agent",
+		"pt": "msg",
+		"to": "okhttp/4.2.2",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 510,
+	"y": 460,
+	"wires": [
+		["d87262d845988268"]
+	]
+}, {
+	"id": "afd6eeb4ba2b537a",
+	"type": "inject",
+	"z": "2e669a42b2ecf4d5",
+	"name": "每周一中午12点更新欧拉登录",
+	"props": [{
+		"p": "payload"
+	}, {
+		"p": "topic",
+		"vt": "str"
+	}],
+	"repeat": "",
+	"crontab": "00 12 * * 1",
+	"once": false,
+	"onceDelay": 0.1,
+	"topic": "",
+	"payloadType": "str",
+	"x": 170,
+	"y": 180,
+	"wires": [
+		["d1fcc1fca6b00978"]
+	]
+}, {
+	"id": "d1fcc1fca6b00978",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "获取登陆Sign取值",
+	"rules": [{
+		"t": "set",
+		"p": "TimeStamp",
+		"pt": "msg",
+		"to": "",
+		"tot": "date"
+	}, {
+		"t": "set",
+		"p": "AppId",
+		"pt": "msg",
+		"to": "GWM719278367448862",
+		"tot": "str"
+	}, {
+		"t": "set",
+		"p": "Secret",
+		"pt": "msg",
+		"to": "8bc742859a7849ec9a924c979afa5a00",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 510,
+	"y": 220,
+	"wires": [
+		["1556b489c4769081"]
+	]
+}, {
+	"id": "1556b489c4769081",
+	"type": "function",
+	"z": "2e669a42b2ecf4d5",
+	"name": "获取登陆Sign转化函数",
+	"func": "msg.payload=msg.TimeStamp+msg.AppId+msg.Secret\nreturn msg;",
+	"outputs": 1,
+	"noerr": 0,
+	"initialize": "",
+	"finalize": "",
+	"libs": [],
+	"x": 520,
+	"y": 280,
+	"wires": [
+		["4d302ee082574646"]
+	]
+}, {
+	"id": "4d302ee082574646",
+	"type": "hash sha256",
+	"z": "2e669a42b2ecf4d5",
+	"name": "哈希sha256加密",
+	"x": 500,
+	"y": 340,
+	"wires": [
+		["36e65535f22c3b42"]
+	]
+}, {
+	"id": "36e65535f22c3b42",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "转化msg.payload名称为msg.Sign",
+	"rules": [{
+		"t": "move",
+		"p": "payload",
+		"pt": "msg",
+		"to": "Sign",
+		"tot": "msg"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 560,
+	"y": 400,
+	"wires": [
+		["c2e544882d56eb1f"]
+	]
+}, {
+	"id": "a424c79f8cda662f",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "用户名",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "用户名"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:account"
+	}, {
+		"property": "unit_of_measurement",
+		"value": ""
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.data.userInfoVo.realName",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1430,
+	"y": 160,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "b93f130bde8cec2a",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "车架号",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "车架号"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:car-info"
+	}, {
+		"property": "unit_of_measurement",
+		"value": ""
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.data.beanTechUserInfo.swellvehicleVOList[0].vin",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1430,
+	"y": 280,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "b8807299545c6433",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "引擎编号",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "引擎编号"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:engine"
+	}, {
+		"property": "unit_of_measurement",
+		"value": ""
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.data.beanTechUserInfo.swellvehicleVOList[0].engineNo",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1440,
+	"y": 220,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "9eae74259d954713",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "车名",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "车名"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:car"
+	}, {
+		"property": "unit_of_measurement",
+		"value": ""
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.data.beanTechUserInfo.swellvehicleVOList[0].brandName",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1430,
+	"y": 100,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "708b29c3ee74e661",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "最近更新时间",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "最近更新时间"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:clock-time-eight-outline"
+	}, {
+		"property": "unit_of_measurement",
+		"value": ""
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1460,
+	"y": 340,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "cb6f161f1133388c",
+	"type": "simpletime",
+	"z": "2e669a42b2ecf4d5",
+	"name": "获取时间",
+	"mydate": false,
+	"myymd": false,
+	"myyear": true,
+	"mymonth": false,
+	"mymonthn": true,
+	"mydom": true,
+	"mydoy": false,
+	"myday": false,
+	"myhourpm": false,
+	"myhour": false,
+	"mytime": false,
+	"mytimes": true,
+	"myminute": false,
+	"myminutes": false,
+	"mysecond": false,
+	"mymillis": false,
+	"myepoch": false,
+	"myrawdate": false,
+	"mypm": false,
+	"x": 1120,
+	"y": 340,
+	"wires": [
+		["bb6d745af013656d"]
+	]
+}, {
+	"id": "bb6d745af013656d",
+	"type": "function",
+	"z": "2e669a42b2ecf4d5",
+	"name": "时间格式转换",
+	"func": "var payload=msg; //get payload\nmsg.payload=msg.myyear\nmsg.payload=msg.payload+\"年\"+payload.mymonthn\nmsg.payload=msg.payload+\"月\"+payload.mydom\nmsg.payload=msg.payload+\"日\"+\" \"+payload.mytimes\nreturn msg;",
+	"outputs": 1,
+	"noerr": 0,
+	"initialize": "",
+	"finalize": "",
+	"libs": [],
+	"x": 1280,
+	"y": 340,
+	"wires": [
+		["708b29c3ee74e661"]
+	]
+}, {
+	"id": "7bf5da89b62783ce",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "获取车辆信息Sign取值",
+	"rules": [{
+		"t": "set",
+		"p": "jsgs",
+		"pt": "msg",
+		"to": "SIGN_BODY=[]&SIGN_TIME=",
+		"tot": "str"
+	}, {
+		"t": "set",
+		"p": "TimeStamp2",
+		"pt": "msg",
+		"to": "",
+		"tot": "date"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 560,
+	"y": 1540,
+	"wires": [
+		["e84282d6faf32275"]
+	]
+}, {
+	"id": "e84282d6faf32275",
+	"type": "function",
+	"z": "2e669a42b2ecf4d5",
+	"name": "获取车辆信息Sign取值函数",
+	"func": "msg.payload=msg.jsgs+msg.TimeStamp2\nreturn msg;",
+	"outputs": 1,
+	"noerr": 0,
+	"initialize": "",
+	"finalize": "",
+	"libs": [],
+	"x": 580,
+	"y": 1600,
+	"wires": [
+		["2953858b8f61aa0a"]
+	]
+}, {
+	"id": "2953858b8f61aa0a",
+	"type": "hmac",
+	"z": "2e669a42b2ecf4d5",
+	"name": "HMAC-sha1加密",
+	"algorithm": "HmacSHA1",
+	"key": "C_KEY=ea49a50f914b8d38af1c84809d302683&API_KEY=dad377585f566b548c961a418dcec41a",
+	"x": 550,
+	"y": 1660,
+	"wires": [
+		["005a7f4e223d74cc"]
+	]
+}, {
+	"id": "14c725cb97483bc7",
+	"type": "debug",
+	"z": "2e669a42b2ecf4d5",
+	"name": "输出信息",
+	"active": true,
+	"tosidebar": true,
+	"console": false,
+	"tostatus": false,
+	"complete": "true",
+	"targetType": "full",
+	"statusVal": "",
+	"statusType": "auto",
+	"x": 960,
+	"y": 220,
+	"wires": []
+}, {
+	"id": "005a7f4e223d74cc",
+	"type": "function",
+	"z": "2e669a42b2ecf4d5",
+	"name": "计算结果转为为原始二进制",
+	"func": "var buf = Buffer.from(msg.payload, 'hex');\nmsg.payload=buf\nreturn msg;",
+	"outputs": 1,
+	"noerr": 0,
+	"initialize": "",
+	"finalize": "",
+	"libs": [],
+	"x": 580,
+	"y": 1720,
+	"wires": [
+		["5d2c1a7b6f1a2ea2"]
+	]
+}, {
+	"id": "5d2c1a7b6f1a2ea2",
+	"type": "base64",
+	"z": "2e669a42b2ecf4d5",
+	"name": "进行Base64加密",
+	"action": "",
+	"property": "payload",
+	"x": 540,
+	"y": 1780,
+	"wires": [
+		["935b23eba132e7b8"]
+	]
+}, {
+	"id": "935b23eba132e7b8",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "转化msg.payload名称为msg.CarSign",
+	"rules": [{
+		"t": "move",
+		"p": "payload",
+		"pt": "msg",
+		"to": "CarSign",
+		"tot": "msg"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 590,
+	"y": 1840,
+	"wires": [
+		["10810c6aa1dc15c1", "1f20a7a5d8f592e8"]
+	]
+}, {
+	"id": "f2362c03bc604e69",
+	"type": "http request",
+	"z": "2e669a42b2ecf4d5",
+	"name": "获取车辆信息",
+	"method": "GET",
+	"ret": "obj",
+	"paytoqs": "ignore",
+	"url": "",
+	"tls": "",
+	"persist": false,
+	"proxy": "",
+	"authType": "",
+	"x": 980,
+	"y": 1660,
+	"wires": [
+		["386acf48bce119ec", "3af06fdca87c1e5f", "c1f28e49be9e7483", "2be362c86942d964", "eb2d2b16813b88e1", "ef41e1f4eb150b50", "44f5952c995bc751", "8288260622fa30c6", "b90fe755dea62c19", "bf84f68e1369c745", "ce2dcb2a9cf2e7fa", "0b71f82ef0bcc744", "ea0b718a800e95ae", "bf8baa3e77824481", "61bef401ef5c0a7a", "fefaa7c46bbe2ba1", "ebcc110873ff3a8d", "eab1393f9898a518", "b82e332b83e633df", "f2dccac1295fdf28", "4b65c8f92d0e7592", "ce1c9f7705191527", "07a205f265e7ed68", "0f9c8e6d4e2f937c", "10d5f59ed456af36"]
+	]
+}, {
+	"id": "10810c6aa1dc15c1",
+	"type": "function",
+	"z": "2e669a42b2ecf4d5",
+	"name": "获取车里信息请求头",
+	"func": "var tokenId = flow.get(\"tokenId\")\nvar vin = flow.get(\"vin\")\nmsg.headers = {\n    \"client\": \"phone\",\n    \"protocolVer\": \"2.1.2\",\n    \"v\": \"1.0\",\n    \"id\": \"ffffffff-a1c9-c606-0000-000029b88992\",\n    \"ckey\": \"ea49a50f914b8d38af1c84809d302683\",\n    \"sign\": msg.CarSign,\n    \"time\": msg.TimeStamp2,\n    \"token\": \"\",\n    \"Host\": \"ti.gwm.com.cn:8443\",\n    \"Connection\": \"Keep-Alive\",\n    \"User-Agent\": \"okhttp/4.2.2\"\n}\nmsg.url = \"https://ti.gwm.com.cn:8443/tsp/ead?p=%7B%22body%22%3A%7B%22vin%22%3A%22\"+vin+\"%22%7D%2C%22header%22%3A%7B%22brandType%22%3A%22Ora%22%2C%22cVer%22%3A%222.3.1%22%2C%22fn%22%3A%22GW.M.GET_VEHICLE_STATE%22%2C%22fv%22%3A%220202%22%2C%22mobileId%22%3A%22ffffffff-a1c9-c606-0000-000029b88992%22%2C%22osType%22%3A%22Android%3ANOH-AN00%22%2C%22osVer%22%3A%2210%22%2C%22rs%22%3A%222%22%2C%22ts%22%3A%2220220922011549310%22%2C%22tk%22%3A%22\"+tokenId+\"%22%2C%22v%22%3A%221.0%22%7D%7D\"\nreturn msg;",
+	"outputs": 1,
+	"noerr": 0,
+	"initialize": "",
+	"finalize": "",
+	"libs": [],
+	"x": 540,
+	"y": 1900,
+	"wires": [
+		["f2362c03bc604e69", "2204390317fd34e9"]
+	]
+}, {
+	"id": "386acf48bce119ec",
+	"type": "debug",
+	"z": "2e669a42b2ecf4d5",
+	"name": "输出信息",
+	"active": true,
+	"tosidebar": true,
+	"console": false,
+	"tostatus": false,
+	"complete": "true",
+	"targetType": "full",
+	"statusVal": "",
+	"statusType": "auto",
+	"x": 1040,
+	"y": 1520,
+	"wires": []
+}, {
+	"id": "3af06fdca87c1e5f",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "hcuEV续航剩余公里数",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "hcuEV续航剩余公里数"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:gauge"
+	}, {
+		"property": "unit_of_measurement",
+		"value": "公里"
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.battSts.hcuEVContnsDistance",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 2000,
+	"y": 820,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "c1f28e49be9e7483",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "欧拉电池健康百分比",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "欧拉电池健康百分比"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:battery-alert"
+	}, {
+		"property": "unit_of_measurement",
+		"value": "%"
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.battSts.battSoh",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 2000,
+	"y": 1000,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "ef41e1f4eb150b50",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "欧拉电池温度",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "欧拉电池温度"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:thermometer"
+	}, {
+		"property": "unit_of_measurement",
+		"value": "℃"
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.battSts.battAvgTemp",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1980,
+	"y": 1060,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "2be362c86942d964",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "欧拉电池剩余百分比",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "欧拉电池剩余百分比"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:battery-70"
+	}, {
+		"property": "unit_of_measurement",
+		"value": "%"
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.battSts.battSoc",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 2000,
+	"y": 880,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "eb2d2b16813b88e1",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "欧拉总续航里程",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "欧拉总续航里程"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:gauge"
+	}, {
+		"property": "unit_of_measurement",
+		"value": "公里"
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.carStatus.vehTotDistance",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1980,
+	"y": 940,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "44f5952c995bc751",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "左前轮温度",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "左前轮温度"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:temperature-celsius"
+	}, {
+		"property": "unit_of_measurement",
+		"value": "℃"
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.carStatus.drvTireTemp",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 2170,
+	"y": 1320,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "8288260622fa30c6",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "右前轮温度",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "右前轮温度"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:temperature-celsius"
+	}, {
+		"property": "unit_of_measurement",
+		"value": "℃"
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.carStatus.passTireTemp",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 2170,
+	"y": 1620,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "b90fe755dea62c19",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "左后轮温度",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "左后轮温度"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:temperature-celsius"
+	}, {
+		"property": "unit_of_measurement",
+		"value": "℃"
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.carStatus.rlTireTemp",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 2170,
+	"y": 1460,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "bf84f68e1369c745",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "右后轮温度",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "右后轮温度"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:temperature-celsius"
+	}, {
+		"property": "unit_of_measurement",
+		"value": "℃"
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.carStatus.rrTireTemp",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 2170,
+	"y": 1760,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "ce2dcb2a9cf2e7fa",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "左前轮胎压",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "左前轮胎压"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:car-tire-alert"
+	}, {
+		"property": "unit_of_measurement",
+		"value": "Bar"
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.carStatus.drvTirePress",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 2370,
+	"y": 1320,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "0b71f82ef0bcc744",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "右前轮胎压",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "右前轮胎压"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:car-tire-alert"
+	}, {
+		"property": "unit_of_measurement",
+		"value": "Bar"
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.carStatus.passTirePress",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 2370,
+	"y": 1620,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "ea0b718a800e95ae",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "左后轮胎压",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "左后轮胎压"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:car-tire-alert"
+	}, {
+		"property": "unit_of_measurement",
+		"value": "Bar"
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.carStatus.rlTirePress",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 2370,
+	"y": 1460,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "bf8baa3e77824481",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "右后轮胎压",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "右后轮胎压"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:car-tire-alert"
+	}, {
+		"property": "unit_of_measurement",
+		"value": "Bar"
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.carStatus.rrTirePress",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 2370,
+	"y": 1760,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "136bcd9fe5d49614",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "欧拉电子门锁状态",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "欧拉电子门锁状态"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:car-key"
+	}, {
+		"property": "unit_of_measurement",
+		"value": ""
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.carStatus.drvDoorLockSts",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1990,
+	"y": 1180,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "21fa914a116282c4",
+	"type": "comment",
+	"z": "2e669a42b2ecf4d5",
+	"name": "欧拉R1获取车辆信息流",
+	"info": "",
+	"x": 140,
+	"y": 1260,
+	"wires": []
+}, {
+	"id": "61bef401ef5c0a7a",
+	"type": "switch",
+	"z": "2e669a42b2ecf4d5",
+	"name": "转化车锁状态显示",
+	"property": "payload.body.vehicleSts.carStatus.drvDoorLockSts",
+	"propertyType": "msg",
+	"rules": [{
+		"t": "eq",
+		"v": "0",
+		"vt": "num"
+	}, {
+		"t": "eq",
+		"v": "1",
+		"vt": "num"
+	}],
+	"checkall": "true",
+	"repair": false,
+	"outputs": 2,
+	"x": 1730,
+	"y": 1120,
+	"wires": [
+		["5f817a70c23908ec"],
+		["951ce71fe09c6a01"]
+	]
+}, {
+	"id": "5f817a70c23908ec",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "锁闭车状态数值变化",
+	"rules": [{
+		"t": "set",
+		"p": "payload.body.vehicleSts.carStatus.drvDoorLockSts",
+		"pt": "msg",
+		"to": "锁闭状态",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1740,
+	"y": 1160,
+	"wires": [
+		["136bcd9fe5d49614"]
+	]
+}, {
+	"id": "951ce71fe09c6a01",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "解锁车状态数值变化",
+	"rules": [{
+		"t": "set",
+		"p": "payload.body.vehicleSts.carStatus.drvDoorLockSts",
+		"pt": "msg",
+		"to": "解锁状态",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1740,
+	"y": 1200,
+	"wires": [
+		["136bcd9fe5d49614"]
+	]
+}, {
+	"id": "06e090add62d2200",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "左前门状态",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "左前门状态"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:car-door-lock"
+	}, {
+		"property": "unit_of_measurement",
+		"value": ""
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.carStatus.drvDoorSts",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1970,
+	"y": 1320,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "ccdb766dc7e4527f",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "左后门状态",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "左后门状态"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:car-door-lock"
+	}, {
+		"property": "unit_of_measurement",
+		"value": ""
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.carStatus.rlDoorSts",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1970,
+	"y": 1460,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "84cf6fb5b411e914",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "后备箱状态",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "后备箱状态"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:bag-checked"
+	}, {
+		"property": "unit_of_measurement",
+		"value": ""
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.carStatus.trunkSts",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1970,
+	"y": 1920,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "fefaa7c46bbe2ba1",
+	"type": "switch",
+	"z": "2e669a42b2ecf4d5",
+	"name": "转化车门状态显示",
+	"property": "payload.body.vehicleSts.carStatus.trunkSts",
+	"propertyType": "msg",
+	"rules": [{
+		"t": "eq",
+		"v": "0",
+		"vt": "num"
+	}, {
+		"t": "eq",
+		"v": "1",
+		"vt": "num"
+	}],
+	"checkall": "true",
+	"repair": false,
+	"outputs": 2,
+	"x": 1730,
+	"y": 1860,
+	"wires": [
+		["80c2199b50904af0"],
+		["dcbf21a3daf94f9b"]
+	]
+}, {
+	"id": "80c2199b50904af0",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "关闭状态数值变化",
+	"rules": [{
+		"t": "set",
+		"p": "payload.body.vehicleSts.carStatus.trunkSts",
+		"pt": "msg",
+		"to": "关闭状态",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1730,
+	"y": 1900,
+	"wires": [
+		["84cf6fb5b411e914"]
+	]
+}, {
+	"id": "dcbf21a3daf94f9b",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "打开状态数值变化",
+	"rules": [{
+		"t": "set",
+		"p": "payload.body.vehicleSts.carStatus.trunkSts",
+		"pt": "msg",
+		"to": "打开状态",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1730,
+	"y": 1940,
+	"wires": [
+		["84cf6fb5b411e914"]
+	]
+}, {
+	"id": "ebcc110873ff3a8d",
+	"type": "switch",
+	"z": "2e669a42b2ecf4d5",
+	"name": "转化车门状态显示",
+	"property": "payload.body.vehicleSts.carStatus.drvDoorSts",
+	"propertyType": "msg",
+	"rules": [{
+		"t": "eq",
+		"v": "0",
+		"vt": "num"
+	}, {
+		"t": "eq",
+		"v": "1",
+		"vt": "num"
+	}],
+	"checkall": "true",
+	"repair": false,
+	"outputs": 2,
+	"x": 1730,
+	"y": 1260,
+	"wires": [
+		["1f442434bc64678a"],
+		["119a789bcf105a7d"]
+	]
+}, {
+	"id": "1f442434bc64678a",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "关闭状态数值变化",
+	"rules": [{
+		"t": "set",
+		"p": "payload.body.vehicleSts.carStatus.drvDoorSts",
+		"pt": "msg",
+		"to": "关闭状态",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1730,
+	"y": 1300,
+	"wires": [
+		["06e090add62d2200"]
+	]
+}, {
+	"id": "119a789bcf105a7d",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "打开状态数值变化",
+	"rules": [{
+		"t": "set",
+		"p": "payload.body.vehicleSts.carStatus.drvDoorSts",
+		"pt": "msg",
+		"to": "打开状态",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1730,
+	"y": 1340,
+	"wires": [
+		["06e090add62d2200"]
+	]
+}, {
+	"id": "eab1393f9898a518",
+	"type": "switch",
+	"z": "2e669a42b2ecf4d5",
+	"name": "转化车门状态显示",
+	"property": "payload.body.vehicleSts.carStatus.rlDoorSts",
+	"propertyType": "msg",
+	"rules": [{
+		"t": "eq",
+		"v": "0",
+		"vt": "num"
+	}, {
+		"t": "eq",
+		"v": "1",
+		"vt": "num"
+	}],
+	"checkall": "true",
+	"repair": false,
+	"outputs": 2,
+	"x": 1730,
+	"y": 1400,
+	"wires": [
+		["e5d1f409f4376461"],
+		["a6f70f1e4b7b74ed"]
+	]
+}, {
+	"id": "e5d1f409f4376461",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "关闭状态数值变化",
+	"rules": [{
+		"t": "set",
+		"p": "payload.body.vehicleSts.carStatus.rlDoorSts",
+		"pt": "msg",
+		"to": "关闭状态",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1730,
+	"y": 1440,
+	"wires": [
+		["ccdb766dc7e4527f"]
+	]
+}, {
+	"id": "a6f70f1e4b7b74ed",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "打开状态数值变化",
+	"rules": [{
+		"t": "set",
+		"p": "payload.body.vehicleSts.carStatus.rlDoorSts",
+		"pt": "msg",
+		"to": "打开状态",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1730,
+	"y": 1480,
+	"wires": [
+		["ccdb766dc7e4527f"]
+	]
+}, {
+	"id": "5eea1fbe04be773e",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "右前门状态",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "右前门状态"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:car-door-lock"
+	}, {
+		"property": "unit_of_measurement",
+		"value": ""
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.carStatus.passDoorSts",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1970,
+	"y": 1620,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "b82e332b83e633df",
+	"type": "switch",
+	"z": "2e669a42b2ecf4d5",
+	"name": "转化车门状态显示",
+	"property": "payload.body.vehicleSts.carStatus.passDoorSts",
+	"propertyType": "msg",
+	"rules": [{
+		"t": "eq",
+		"v": "0",
+		"vt": "num"
+	}, {
+		"t": "eq",
+		"v": "1",
+		"vt": "num"
+	}],
+	"checkall": "true",
+	"repair": false,
+	"outputs": 2,
+	"x": 1730,
+	"y": 1560,
+	"wires": [
+		["99ec13d0c5483c14"],
+		["70e00fcde3b8ecb9"]
+	]
+}, {
+	"id": "99ec13d0c5483c14",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "关闭状态数值变化",
+	"rules": [{
+		"t": "set",
+		"p": "payload.body.vehicleSts.carStatus.passDoorSts",
+		"pt": "msg",
+		"to": "关闭状态",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1730,
+	"y": 1600,
+	"wires": [
+		["5eea1fbe04be773e"]
+	]
+}, {
+	"id": "70e00fcde3b8ecb9",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "打开状态数值变化",
+	"rules": [{
+		"t": "set",
+		"p": "payload.body.vehicleSts.carStatus.passDoorSts",
+		"pt": "msg",
+		"to": "打开状态",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1730,
+	"y": 1640,
+	"wires": [
+		["5eea1fbe04be773e"]
+	]
+}, {
+	"id": "021f1d25a0f5b819",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "右后门状态",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "右后门状态"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:car-door-lock"
+	}, {
+		"property": "unit_of_measurement",
+		"value": ""
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.carStatus.rrDoorSts",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1970,
+	"y": 1760,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "f2dccac1295fdf28",
+	"type": "switch",
+	"z": "2e669a42b2ecf4d5",
+	"name": "转化车门状态显示",
+	"property": "payload.body.vehicleSts.carStatus.rrDoorSts",
+	"propertyType": "msg",
+	"rules": [{
+		"t": "eq",
+		"v": "0",
+		"vt": "num"
+	}, {
+		"t": "eq",
+		"v": "1",
+		"vt": "num"
+	}],
+	"checkall": "true",
+	"repair": false,
+	"outputs": 2,
+	"x": 1730,
+	"y": 1700,
+	"wires": [
+		["8147d54b6aee8069"],
+		["34ccf36998623a9f"]
+	]
+}, {
+	"id": "8147d54b6aee8069",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "关闭状态数值变化",
+	"rules": [{
+		"t": "set",
+		"p": "payload.body.vehicleSts.carStatus.rrDoorSts",
+		"pt": "msg",
+		"to": "关闭状态",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1730,
+	"y": 1740,
+	"wires": [
+		["021f1d25a0f5b819"]
+	]
+}, {
+	"id": "34ccf36998623a9f",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "打开状态数值变化",
+	"rules": [{
+		"t": "set",
+		"p": "payload.body.vehicleSts.carStatus.rrDoorSts",
+		"pt": "msg",
+		"to": "打开状态",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1730,
+	"y": 1780,
+	"wires": [
+		["021f1d25a0f5b819"]
+	]
+}, {
+	"id": "9eca9455f4166ff9",
+	"type": "function",
+	"z": "2e669a42b2ecf4d5",
+	"name": "保存参数到flow",
+	"func": "flow.set(\"tokenId\",msg.payload.data.beanTechUserInfo.tokenId);\nflow.set(\"Authorization\",msg.payload.data.tokenValue);\nflow.set(\"Sign\",msg.Sign);\nflow.set(\"time\",msg.TimeStamp);\nflow.set(\"vin\",msg.payload.data.beanTechUserInfo.swellvehicleVOList[0].vin);",
+	"outputs": 0,
+	"noerr": 0,
+	"initialize": "",
+	"finalize": "",
+	"libs": [],
+	"x": 1100,
+	"y": 540,
+	"wires": []
+}, {
+	"id": "a1234a45ca5b20f2",
+	"type": "server-state-changed",
+	"z": "2e669a42b2ecf4d5",
+	"name": "欧拉车辆状态更新",
+	"server": "6b9343d6.6f2ffc",
+	"version": 4,
+	"exposeToHomeAssistant": false,
+	"haConfig": [{
+		"property": "name",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": ""
+	}],
+	"entityidfilter": "input_boolean.ora_renew",
+	"entityidfiltertype": "exact",
+	"outputinitially": false,
+	"state_type": "str",
+	"haltifstate": "on",
+	"halt_if_type": "str",
+	"halt_if_compare": "is",
+	"outputs": 2,
+	"output_only_on_state_change": true,
+	"for": 0,
+	"forType": "num",
+	"forUnits": "minutes",
+	"ignorePrevStateNull": false,
+	"ignorePrevStateUnknown": false,
+	"ignorePrevStateUnavailable": false,
+	"ignoreCurrentStateUnknown": false,
+	"ignoreCurrentStateUnavailable": false,
+	"outputProperties": [{
+		"property": "button",
+		"propertyType": "msg",
+		"value": "",
+		"valueType": "entityState"
+	}],
+	"x": 150,
+	"y": 1420,
+	"wires": [
+		["7bf5da89b62783ce", "144cbd20929461df"],
+		[]
+	]
+}, {
+	"id": "d7fcb06dfab922f2",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "转化msg.payload名称为msg.CarState",
+	"rules": [{
+		"t": "move",
+		"p": "payload",
+		"pt": "msg",
+		"to": "CarState",
+		"tot": "msg"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1490,
+	"y": 2420,
+	"wires": [
+		["9d5a0e7c970d868e"]
+	]
+}, {
+	"id": "2f9a94adb36ca2a5",
+	"type": "gaode",
+	"z": "2e669a42b2ecf4d5",
+	"server": "0922dd2da41f4cd7",
+	"name": "高德定位",
+	"longitude": "",
+	"latitude": "",
+	"zoom": "17",
+	"x": 1720,
+	"y": 2500,
+	"wires": [
+		["33da5793993ea402"]
+	]
+}, {
+	"id": "9d5a0e7c970d868e",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "定位数据整理",
+	"rules": [{
+		"t": "set",
+		"p": "payload",
+		"pt": "msg",
+		"to": "{}",
+		"tot": "json"
+	}, {
+		"t": "move",
+		"p": "CarState.body.vehicleSts.carStatus.lon",
+		"pt": "msg",
+		"to": "payload.longitude",
+		"tot": "msg"
+	}, {
+		"t": "move",
+		"p": "CarState.body.vehicleSts.carStatus.lat",
+		"pt": "msg",
+		"to": "payload.latitude",
+		"tot": "msg"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1480,
+	"y": 2460,
+	"wires": [
+		["9927ed3dc0f80771"]
+	]
+}, {
+	"id": "9927ed3dc0f80771",
+	"type": "function",
+	"z": "2e669a42b2ecf4d5",
+	"name": "修正地址偏移值",
+	"func": "msg.payload.longitude=(parseFloat(msg.payload.longitude).toFixed(14) - 0.00391).toString()\nmsg.payload.latitude=(parseFloat(msg.payload.latitude).toFixed(14) - -0.00370).toString()\n//msg.payload.longitude=(parseFloat(msg.payload.longitude).toFixed(14) - 0.00632).toString()\n//msg.payload.latitude=(parseFloat(msg.payload.latitude).toFixed(14) - 0.0062).toString()\nreturn msg;",
+	"outputs": 1,
+	"noerr": 0,
+	"initialize": "",
+	"finalize": "",
+	"libs": [],
+	"x": 1480,
+	"y": 2500,
+	"wires": [
+		["2f9a94adb36ca2a5", "56130f7254c664b3"]
+	]
+}, {
+	"id": "8ec601bea7870975",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "状态更新时间",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "状态更新时间"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:clock-time-eight-outline"
+	}, {
+		"property": "unit_of_measurement",
+		"value": ""
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1980,
+	"y": 2760,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "2204390317fd34e9",
+	"type": "simpletime",
+	"z": "2e669a42b2ecf4d5",
+	"name": "获取时间",
+	"mydate": false,
+	"myymd": false,
+	"myyear": true,
+	"mymonth": false,
+	"mymonthn": true,
+	"mydom": true,
+	"mydoy": false,
+	"myday": false,
+	"myhourpm": false,
+	"myhour": false,
+	"mytime": false,
+	"mytimes": true,
+	"myminute": false,
+	"myminutes": false,
+	"mysecond": false,
+	"mymillis": false,
+	"myepoch": false,
+	"myrawdate": false,
+	"mypm": false,
+	"x": 1580,
+	"y": 2760,
+	"wires": [
+		["852de7584bca1e22"]
+	]
+}, {
+	"id": "852de7584bca1e22",
+	"type": "function",
+	"z": "2e669a42b2ecf4d5",
+	"name": "时间格式转换",
+	"func": "var payload=msg; //get payload\nmsg.payload=msg.myyear\nmsg.payload=msg.payload+\"年\"+payload.mymonthn\nmsg.payload=msg.payload+\"月\"+payload.mydom\nmsg.payload=msg.payload+\"日\"+\" \"+payload.mytimes\nreturn msg;",
+	"outputs": 1,
+	"noerr": 0,
+	"initialize": "",
+	"finalize": "",
+	"libs": [],
+	"x": 1780,
+	"y": 2760,
+	"wires": [
+		["8ec601bea7870975"]
+	]
+}, {
+	"id": "4b65c8f92d0e7592",
+	"type": "switch",
+	"z": "2e669a42b2ecf4d5",
+	"name": "更新状态成功与否",
+	"property": "payload.header.m",
+	"propertyType": "msg",
+	"rules": [{
+		"t": "eq",
+		"v": "缓存数据已失效，需要您重新进行登录，给您带来的不便敬请谅解。",
+		"vt": "str"
+	}, {
+		"t": "else"
+	}],
+	"checkall": "true",
+	"repair": false,
+	"outputs": 2,
+	"x": 1510,
+	"y": 2640,
+	"wires": [
+		["8668dfc493c77ee4"],
+		["87d02793f8d66cf2"]
+	]
+}, {
+	"id": "51d54849fd0f2a41",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "更新状态反馈",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "更新状态反馈"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:autorenew"
+	}, {
+		"property": "unit_of_measurement",
+		"value": ""
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.header.m",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1980,
+	"y": 2640,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "87d02793f8d66cf2",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "转化信息",
+	"rules": [{
+		"t": "set",
+		"p": "payload.header.m",
+		"pt": "msg",
+		"to": "状态更新成功",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1780,
+	"y": 2600,
+	"wires": [
+		["51d54849fd0f2a41"]
+	]
+}, {
+	"id": "8668dfc493c77ee4",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "转化信息",
+	"rules": [{
+		"t": "set",
+		"p": "payload.header.m",
+		"pt": "msg",
+		"to": "状态更新失败，请重新登录！",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1780,
+	"y": 2680,
+	"wires": [
+		["51d54849fd0f2a41"]
+	]
+}, {
+	"id": "44c289bf75afeedb",
+	"type": "server-state-changed",
+	"z": "2e669a42b2ecf4d5",
+	"name": "欧拉车联网重新登录",
+	"server": "6b9343d6.6f2ffc",
+	"version": 4,
+	"exposeToHomeAssistant": false,
+	"haConfig": [{
+		"property": "name",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": ""
+	}],
+	"entityidfilter": "input_boolean.ora_relogin",
+	"entityidfiltertype": "exact",
+	"outputinitially": false,
+	"state_type": "str",
+	"haltifstate": "on",
+	"halt_if_type": "str",
+	"halt_if_compare": "is",
+	"outputs": 2,
+	"output_only_on_state_change": true,
+	"for": 0,
+	"forType": "num",
+	"forUnits": "minutes",
+	"ignorePrevStateNull": false,
+	"ignorePrevStateUnknown": false,
+	"ignorePrevStateUnavailable": false,
+	"ignoreCurrentStateUnknown": false,
+	"ignoreCurrentStateUnavailable": false,
+	"outputProperties": [{
+		"property": "button",
+		"propertyType": "msg",
+		"value": "",
+		"valueType": "entityState"
+	}],
+	"x": 150,
+	"y": 300,
+	"wires": [
+		["d1fcc1fca6b00978", "19cfcfd39327ca45"],
+		[]
+	]
+}, {
+	"id": "80978a08928de1fd",
+	"type": "switch",
+	"z": "2e669a42b2ecf4d5",
+	"name": "更新状态成功与否",
+	"property": "payload.message",
+	"propertyType": "msg",
+	"rules": [{
+		"t": "eq",
+		"v": "成功",
+		"vt": "str"
+	}, {
+		"t": "else"
+	}],
+	"checkall": "true",
+	"repair": false,
+	"outputs": 2,
+	"x": 1110,
+	"y": 420,
+	"wires": [
+		["0569826c14d8ec57"],
+		["bcde6c746e6797c5"]
+	]
+}, {
+	"id": "f9cf64482a9a2355",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "登录状态反馈",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "登录状态反馈"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:autorenew"
+	}, {
+		"property": "unit_of_measurement",
+		"value": ""
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.message",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1460,
+	"y": 420,
+	"wires": [
+		["1d559ddf25c5b4f4"]
+	]
+}, {
+	"id": "0569826c14d8ec57",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "转化信息",
+	"rules": [{
+		"t": "set",
+		"p": "payload.message",
+		"pt": "msg",
+		"to": "登录成功！",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1300,
+	"y": 400,
+	"wires": [
+		["f9cf64482a9a2355"]
+	]
+}, {
+	"id": "bcde6c746e6797c5",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "转化信息",
+	"rules": [{
+		"t": "set",
+		"p": "payload.message",
+		"pt": "msg",
+		"to": "登录失败，请检查！",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1300,
+	"y": 440,
+	"wires": [
+		["f9cf64482a9a2355"]
+	]
+}, {
+	"id": "4feaab3d9e5144d6",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "近光灯",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "近光灯"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:car-light-dimmed"
+	}, {
+		"property": "unit_of_measurement",
+		"value": ""
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.carStatus.dippedHeadlight",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1950,
+	"y": 2080,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "1348384af8a0c884",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "远光灯",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "远光灯"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:car-light-high"
+	}, {
+		"property": "unit_of_measurement",
+		"value": ""
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.carStatus.highBeam",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1950,
+	"y": 2260,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "ce1c9f7705191527",
+	"type": "switch",
+	"z": "2e669a42b2ecf4d5",
+	"name": "转化灯光状态显示",
+	"property": "payload.body.vehicleSts.carStatus.dippedHeadlight",
+	"propertyType": "msg",
+	"rules": [{
+		"t": "eq",
+		"v": "0",
+		"vt": "num"
+	}, {
+		"t": "eq",
+		"v": "1",
+		"vt": "num"
+	}],
+	"checkall": "true",
+	"repair": false,
+	"outputs": 2,
+	"x": 1730,
+	"y": 2020,
+	"wires": [
+		["4b5b6f1855abaec8"],
+		["3f15217a0f6c2116"]
+	]
+}, {
+	"id": "4b5b6f1855abaec8",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "关闭状态数值变化",
+	"rules": [{
+		"t": "set",
+		"p": "payload.body.vehicleSts.carStatus.dippedHeadlight",
+		"pt": "msg",
+		"to": "关闭状态",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1730,
+	"y": 2080,
+	"wires": [
+		["4feaab3d9e5144d6"]
+	]
+}, {
+	"id": "3f15217a0f6c2116",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "开启状态数值变化",
+	"rules": [{
+		"t": "set",
+		"p": "payload.body.vehicleSts.carStatus.dippedHeadlight",
+		"pt": "msg",
+		"to": "开启状态",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1730,
+	"y": 2120,
+	"wires": [
+		["4feaab3d9e5144d6"]
+	]
+}, {
+	"id": "07a205f265e7ed68",
+	"type": "switch",
+	"z": "2e669a42b2ecf4d5",
+	"name": "转化灯光状态显示",
+	"property": "payload.body.vehicleSts.carStatus.highBeam",
+	"propertyType": "msg",
+	"rules": [{
+		"t": "eq",
+		"v": "0",
+		"vt": "num"
+	}, {
+		"t": "eq",
+		"v": "1",
+		"vt": "num"
+	}],
+	"checkall": "true",
+	"repair": false,
+	"outputs": 2,
+	"x": 1730,
+	"y": 2200,
+	"wires": [
+		["269931c530c6dc56"],
+		["3390d125286c591c"]
+	]
+}, {
+	"id": "269931c530c6dc56",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "关闭状态数值变化",
+	"rules": [{
+		"t": "set",
+		"p": "payload.body.vehicleSts.carStatus.highBeam",
+		"pt": "msg",
+		"to": "关闭状态",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1730,
+	"y": 2240,
+	"wires": [
+		["1348384af8a0c884"]
+	]
+}, {
+	"id": "3390d125286c591c",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "开启状态数值变化",
+	"rules": [{
+		"t": "set",
+		"p": "payload.body.vehicleSts.carStatus.highBeam",
+		"pt": "msg",
+		"to": "开启状态",
+		"tot": "str"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 1730,
+	"y": 2280,
+	"wires": [
+		["1348384af8a0c884"]
+	]
+}, {
+	"id": "1f20a7a5d8f592e8",
+	"type": "function",
+	"z": "2e669a42b2ecf4d5",
+	"name": "保存参数flow中",
+	"func": "flow.set(\"CarSign\",msg.CarSign);",
+	"outputs": 0,
+	"noerr": 0,
+	"initialize": "",
+	"finalize": "",
+	"libs": [],
+	"x": 880,
+	"y": 1840,
+	"wires": []
+}, {
+	"id": "56130f7254c664b3",
+	"type": "function",
+	"z": "2e669a42b2ecf4d5",
+	"name": "GPS坐标取值",
+	"func": "msg.payload = {\n\"longitude\":msg.payload.longitude,\n\"latitude\":msg.payload.latitude,};\nreturn msg;",
+	"outputs": 1,
+	"noerr": 0,
+	"initialize": "",
+	"finalize": "",
+	"libs": [],
+	"x": 1760,
+	"y": 2380,
+	"wires": [
+		["6d2212bb25ac306b"]
+	]
+}, {
+	"id": "6d2212bb25ac306b",
+	"type": "json",
+	"z": "2e669a42b2ecf4d5",
+	"name": "数据处理",
+	"property": "payload",
+	"action": "",
+	"pretty": false,
+	"x": 1760,
+	"y": 2420,
+	"wires": [
+		["7c0f8415d832e147"]
+	]
+}, {
+	"id": "7c0f8415d832e147",
+	"type": "mqtt out",
+	"z": "2e669a42b2ecf4d5",
+	"name": "欧拉车辆定位",
+	"topic": "locaton/ora",
+	"qos": "1",
+	"retain": "false",
+	"respTopic": "",
+	"contentType": "",
+	"userProps": "",
+	"correl": "",
+	"expiry": "",
+	"broker": "c3f6f41e16edc09c",
+	"x": 1980,
+	"y": 2380,
+	"wires": []
+}, {
+	"id": "33da5793993ea402",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "欧拉车辆位置",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "欧拉车辆位置"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:map-marker-radius"
+	}, {
+		"property": "unit_of_measurement",
+		"value": ""
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.location",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1980,
+	"y": 2500,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "cec3f69f4b3f2c28",
+	"type": "http request",
+	"z": "2e669a42b2ecf4d5",
+	"name": "锁闭车辆",
+	"method": "GET",
+	"ret": "obj",
+	"paytoqs": "ignore",
+	"url": "",
+	"tls": "",
+	"persist": false,
+	"proxy": "",
+	"authType": "",
+	"x": 740,
+	"y": 3340,
+	"wires": [
+		["1ee4484dd7301adf", "283afaa3fbcbaa70"]
+	]
+}, {
+	"id": "e592ba41b901816e",
+	"type": "function",
+	"z": "2e669a42b2ecf4d5",
+	"name": "锁车请求头",
+	"func": "var tokenId = flow.get(\"tokenId\")\nvar CarSign = flow.get(\"CarSign\")\nvar pin = flow.get(\"pin\")\nvar vin = flow.get(\"vin\")\n\nmsg.headers = {\n    \"client\": \"phone\",\n    \"protocolVer\": \"2.1.2\",\n    \"v\": \"1.0\",\n    \"cid\": \"ffffffff-a1c9-c606-0000-000029b88992\",\n    \"ckey\": \"ea49a50f914b8d38af1c84809d302683\",\n    \"sign\": CarSign,\n    \"time\": msg.TimeStamp3,\n    \"token\": \"\",\n    \"Host\": \"ti.gwm.com.cn:8443\",\n    \"Connection\": \"Keep-Alive\",\n    \"User-Agent\": \"okhttp/4.2.2\"\n}\nmsg.url = \"https://ti.gwm.com.cn:8443/tsp/ead?p=%7B%22body%22%3A%7B%22cmdCode%22%3A%222%22%2C%22flag%22%3A0%2C%22scyPwd%22%3A%22\"+pin+\"%22%2C%22userType%22%3A%220%22%2C%22vin%22%3A%22\"+vin+\"%22%7D%2C%22header%22%3A%7B%22brandType%22%3A%22Ora%22%2C%22cVer%22%3A%223.2.302%22%2C%22fn%22%3A%22GW.M.SEND_COMMON_COMMAND%22%2C%22fv%22%3A%220202%22%2C%22mobileId%22%3A%22ffffffff-a1c9-c606-0000-000029b88992%22%2C%22osType%22%3A%22Android%3ANOH-AN00%22%2C%22osVer%22%3A%227.1.2%22%2C%22rs%22%3A%222%22%2C%22ts%22%3A%2220220923111216574%22%2C%22tk%22%3A%22\"+tokenId+\"%22%2C%22v%22%3A%221.0%22%7D%7D\"\nreturn msg;",
+	"outputs": 1,
+	"noerr": 0,
+	"initialize": "",
+	"finalize": "",
+	"libs": [],
+	"x": 530,
+	"y": 3340,
+	"wires": [
+		["cec3f69f4b3f2c28"]
+	]
+}, {
+	"id": "1ee4484dd7301adf",
+	"type": "debug",
+	"z": "2e669a42b2ecf4d5",
+	"name": "输出信息",
+	"active": true,
+	"tosidebar": true,
+	"console": false,
+	"tostatus": false,
+	"complete": "true",
+	"targetType": "full",
+	"statusVal": "",
+	"statusType": "auto",
+	"x": 920,
+	"y": 3400,
+	"wires": []
+}, {
+	"id": "57c757c203c8182c",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "获取时间",
+	"rules": [{
+		"t": "set",
+		"p": "TimeStamp3",
+		"pt": "msg",
+		"to": "",
+		"tot": "date"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 380,
+	"y": 3340,
+	"wires": [
+		["e592ba41b901816e"]
+	]
+}, {
+	"id": "a998a13814df0aa2",
+	"type": "inject",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"props": [{
+		"p": "payload"
+	}, {
+		"p": "topic",
+		"vt": "str"
+	}],
+	"repeat": "",
+	"crontab": "",
+	"once": false,
+	"onceDelay": 0.1,
+	"topic": "",
+	"payload": "",
+	"payloadType": "date",
+	"x": 190,
+	"y": 3340,
+	"wires": [
+		["57c757c203c8182c"]
+	]
+}, {
+	"id": "420a33b337496075",
+	"type": "comment",
+	"z": "2e669a42b2ecf4d5",
+	"name": "锁车",
+	"info": "",
+	"x": 170,
+	"y": 3220,
+	"wires": []
+}, {
+	"id": "2e933a7d565212ab",
+	"type": "http request",
+	"z": "2e669a42b2ecf4d5",
+	"name": "解锁车辆",
+	"method": "GET",
+	"ret": "obj",
+	"paytoqs": "ignore",
+	"url": "",
+	"tls": "",
+	"persist": false,
+	"proxy": "",
+	"authType": "",
+	"x": 720,
+	"y": 3600,
+	"wires": [
+		["f336f8f66ec1cfbd", "b7cb5c98ba69304d"]
+	]
+}, {
+	"id": "734c9d99da64d99f",
+	"type": "function",
+	"z": "2e669a42b2ecf4d5",
+	"name": "解锁请求头",
+	"func": "var tokenId = flow.get(\"tokenId\")\nvar CarSign = flow.get(\"CarSign\")\nvar pin = flow.get(\"pin\")\nvar vin = flow.get(\"vin\")\nmsg.headers = {\n    \"client\": \"phone\",\n    \"protocolVer\": \"2.1.2\",\n    \"v\": \"1.0\",\n    \"cid\": \"ffffffff-a1c9-c606-0000-000029b88992\",\n    \"ckey\": \"ea49a50f914b8d38af1c84809d302683\",\n    \"sign\": CarSign,\n    \"time\": msg.TimeStamp4,\n    \"token\": \"\",\n    \"Host\": \"ti.gwm.com.cn:8443\",\n    \"Connection\": \"Keep-Alive\",\n    \"User-Agent\": \"okhttp/4.2.2\"\n}\nmsg.url = \"https://ti.gwm.com.cn:8443/tsp/ead?p=%7B%22body%22%3A%7B%22cmdCode%22%3A%221%22%2C%22flag%22%3A0%2C%22scyPwd%22%3A%22\"+pin+\"%22%2C%22userType%22%3A%220%22%2C%22vin%22%3A%22\"+vin+\"%22%7D%2C%22header%22%3A%7B%22brandType%22%3A%22Ora%22%2C%22cVer%22%3A%223.2.302%22%2C%22fn%22%3A%22GW.M.SEND_COMMON_COMMAND%22%2C%22fv%22%3A%220202%22%2C%22mobileId%22%3A%22ffffffff-a1c9-c606-0000-000029b88992%22%2C%22osType%22%3A%22Android%3ANOH-AN00%22%2C%22osVer%22%3A%227.1.2%22%2C%22rs%22%3A%222%22%2C%22ts%22%3A%2220211211111216574%22%2C%22tk%22%3A%22\"+tokenId+\"%22%2C%22v%22%3A%221.0%22%7D%7D\"\nreturn msg;",
+	"outputs": 1,
+	"noerr": 0,
+	"initialize": "",
+	"finalize": "",
+	"libs": [],
+	"x": 510,
+	"y": 3600,
+	"wires": [
+		["2e933a7d565212ab"]
+	]
+}, {
+	"id": "f336f8f66ec1cfbd",
+	"type": "debug",
+	"z": "2e669a42b2ecf4d5",
+	"name": "输出信息",
+	"active": true,
+	"tosidebar": true,
+	"console": false,
+	"tostatus": false,
+	"complete": "true",
+	"targetType": "full",
+	"statusVal": "",
+	"statusType": "auto",
+	"x": 920,
+	"y": 3640,
+	"wires": []
+}, {
+	"id": "600474fb929934ba",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "获取时间",
+	"rules": [{
+		"t": "set",
+		"p": "TimeStamp4",
+		"pt": "msg",
+		"to": "",
+		"tot": "date"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 360,
+	"y": 3600,
+	"wires": [
+		["734c9d99da64d99f"]
+	]
+}, {
+	"id": "75742e738eb035ab",
+	"type": "inject",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"props": [{
+		"p": "payload"
+	}, {
+		"p": "topic",
+		"vt": "str"
+	}],
+	"repeat": "",
+	"crontab": "",
+	"once": false,
+	"onceDelay": 0.1,
+	"topic": "",
+	"payload": "",
+	"payloadType": "date",
+	"x": 210,
+	"y": 3600,
+	"wires": [
+		["600474fb929934ba"]
+	]
+}, {
+	"id": "96d9baa85660db31",
+	"type": "comment",
+	"z": "2e669a42b2ecf4d5",
+	"name": "解锁",
+	"info": "",
+	"x": 190,
+	"y": 3480,
+	"wires": []
+}, {
+	"id": "bcbca618f858b232",
+	"type": "http request",
+	"z": "2e669a42b2ecf4d5",
+	"name": "开空调冷气",
+	"method": "GET",
+	"ret": "obj",
+	"paytoqs": "ignore",
+	"url": "",
+	"tls": "",
+	"persist": false,
+	"proxy": "",
+	"authType": "",
+	"x": 730,
+	"y": 3820,
+	"wires": [
+		["aba87b59ccd5836e", "c3be80ad862d0982"]
+	]
+}, {
+	"id": "2a019f2bd8020828",
+	"type": "function",
+	"z": "2e669a42b2ecf4d5",
+	"name": "开空调冷气请求头",
+	"func": "var tokenId = flow.get(\"tokenId\")\nvar CarSign = flow.get(\"CarSign\")\nvar pin = flow.get(\"pin\")\nvar vin = flow.get(\"vin\")\nmsg.headers = {\n    \"client\": \"phone\",\n    \"protocolVer\": \"2.1.2\",\n    \"v\": \"1.0\",\n    \"cid\": \"ffffffff-a1c9-c606-0000-000029b88992\",\n    \"ckey\": \"ea49a50f914b8d38af1c84809d302683\",\n    \"sign\": CarSign,\n    \"time\": msg.TimeStamp5,\n    \"token\": \"\",\n    \"Host\": \"ti.gwm.com.cn:8443\",\n    \"Connection\": \"Keep-Alive\",\n    \"User-Agent\": \"okhttp/4.2.2\"\n}\nmsg.url = \"https://ti.gwm.com.cn:8443/tsp/ead?p=%7B%22body%22%3A%7B%22cmdCode%22%3A%226%22%2C%22flag%22%3A0%2C%22scyPwd%22%3A%22\"+pin+\"%22%2C%22userType%22%3A%220%22%2C%22vin%22%3A%22\"+vin+\"%22%7D%2C%22header%22%3A%7B%22brandType%22%3A%22Ora%22%2C%22cVer%22%3A%223.2.302%22%2C%22fn%22%3A%22GW.M.SEND_COMMON_COMMAND%22%2C%22fv%22%3A%220202%22%2C%22mobileId%22%3A%22ffffffff-a1c9-c606-0000-000029b88992%22%2C%22osType%22%3A%22Android%3ANOH-AN00%22%2C%22osVer%22%3A%227.1.2%22%2C%22rs%22%3A%222%22%2C%22ts%22%3A%2220211211111216574%22%2C%22tk%22%3A%22\"+tokenId+\"%22%2C%22v%22%3A%221.0%22%7D%7D\"\nreturn msg;",
+	"outputs": 1,
+	"noerr": 0,
+	"initialize": "",
+	"finalize": "",
+	"libs": [],
+	"x": 530,
+	"y": 3820,
+	"wires": [
+		["bcbca618f858b232"]
+	]
+}, {
+	"id": "aba87b59ccd5836e",
+	"type": "debug",
+	"z": "2e669a42b2ecf4d5",
+	"name": "输出信息",
+	"active": true,
+	"tosidebar": true,
+	"console": false,
+	"tostatus": false,
+	"complete": "true",
+	"targetType": "full",
+	"statusVal": "",
+	"statusType": "auto",
+	"x": 920,
+	"y": 3880,
+	"wires": []
+}, {
+	"id": "27f6cad7d8d68da7",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "获取时间",
+	"rules": [{
+		"t": "set",
+		"p": "TimeStamp5",
+		"pt": "msg",
+		"to": "",
+		"tot": "date"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 360,
+	"y": 3820,
+	"wires": [
+		["2a019f2bd8020828"]
+	]
+}, {
+	"id": "81227507bf57b833",
+	"type": "inject",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"props": [{
+		"p": "payload"
+	}, {
+		"p": "topic",
+		"vt": "str"
+	}],
+	"repeat": "",
+	"crontab": "",
+	"once": false,
+	"onceDelay": 0.1,
+	"topic": "",
+	"payload": "",
+	"payloadType": "date",
+	"x": 210,
+	"y": 3820,
+	"wires": [
+		["27f6cad7d8d68da7"]
+	]
+}, {
+	"id": "71e7b7798e5ec34d",
+	"type": "comment",
+	"z": "2e669a42b2ecf4d5",
+	"name": "开空调冷气",
+	"info": "",
+	"x": 200,
+	"y": 3700,
+	"wires": []
+}, {
+	"id": "60a801fde1aade18",
+	"type": "http request",
+	"z": "2e669a42b2ecf4d5",
+	"name": "关空调冷气",
+	"method": "GET",
+	"ret": "obj",
+	"paytoqs": "ignore",
+	"url": "",
+	"tls": "",
+	"persist": false,
+	"proxy": "",
+	"authType": "",
+	"x": 750,
+	"y": 4020,
+	"wires": [
+		["67ede97549a88e4d", "8303f706f1cf68b5"]
+	]
+}, {
+	"id": "8ca88dda5b6d5363",
+	"type": "function",
+	"z": "2e669a42b2ecf4d5",
+	"name": "关空调冷气请求头",
+	"func": "var tokenId = flow.get(\"tokenId\")\nvar CarSign = flow.get(\"CarSign\")\nvar pin = flow.get(\"pin\")\nvar vin = flow.get(\"vin\")\nmsg.headers = {\n    \"client\": \"phone\",\n    \"protocolVer\": \"2.1.2\",\n    \"v\": \"1.0\",\n    \"cid\": \"ffffffff-a1c9-c606-0000-000029b88992\",\n    \"ckey\": \"ea49a50f914b8d38af1c84809d302683\",\n    \"sign\": CarSign,\n    \"time\": msg.TimeStamp6,\n    \"token\": \"\",\n    \"Host\": \"ti.gwm.com.cn:8443\",\n    \"Connection\": \"Keep-Alive\",\n    \"User-Agent\": \"okhttp/4.2.2\"\n}\nmsg.url = \"https://ti.gwm.com.cn:8443/tsp/ead?p=%7B%22body%22%3A%7B%22cmdCode%22%3A%227%22%2C%22flag%22%3A0%2C%22scyPwd%22%3A%22\"+pin+\"%22%2C%22userType%22%3A%220%22%2C%22vin%22%3A%22\"+vin+\"%22%7D%2C%22header%22%3A%7B%22brandType%22%3A%22Ora%22%2C%22cVer%22%3A%223.2.302%22%2C%22fn%22%3A%22GW.M.SEND_COMMON_COMMAND%22%2C%22fv%22%3A%220202%22%2C%22mobileId%22%3A%22ffffffff-a1c9-c606-0000-000029b88992%22%2C%22osType%22%3A%22Android%3ANOH-AN00%22%2C%22osVer%22%3A%227.1.2%22%2C%22rs%22%3A%222%22%2C%22ts%22%3A%2220211211111216574%22%2C%22tk%22%3A%22\"+tokenId+\"%22%2C%22v%22%3A%221.0%22%7D%7D\"\nreturn msg;",
+	"outputs": 1,
+	"noerr": 0,
+	"initialize": "",
+	"finalize": "",
+	"libs": [],
+	"x": 550,
+	"y": 4020,
+	"wires": [
+		["60a801fde1aade18"]
+	]
+}, {
+	"id": "67ede97549a88e4d",
+	"type": "debug",
+	"z": "2e669a42b2ecf4d5",
+	"name": "输出信息",
+	"active": true,
+	"tosidebar": true,
+	"console": false,
+	"tostatus": false,
+	"complete": "true",
+	"targetType": "full",
+	"statusVal": "",
+	"statusType": "auto",
+	"x": 960,
+	"y": 4080,
+	"wires": []
+}, {
+	"id": "6d7b8569515f439d",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "获取时间",
+	"rules": [{
+		"t": "set",
+		"p": "TimeStamp6",
+		"pt": "msg",
+		"to": "",
+		"tot": "date"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 380,
+	"y": 4020,
+	"wires": [
+		["8ca88dda5b6d5363"]
+	]
+}, {
+	"id": "e8f31ae09be4cd67",
+	"type": "inject",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"props": [{
+		"p": "payload"
+	}, {
+		"p": "topic",
+		"vt": "str"
+	}],
+	"repeat": "",
+	"crontab": "",
+	"once": false,
+	"onceDelay": 0.1,
+	"topic": "",
+	"payload": "",
+	"payloadType": "date",
+	"x": 210,
+	"y": 4020,
+	"wires": [
+		["6d7b8569515f439d"]
+	]
+}, {
+	"id": "5b9a89d6f19ce85a",
+	"type": "comment",
+	"z": "2e669a42b2ecf4d5",
+	"name": "关空调冷气",
+	"info": "",
+	"x": 200,
+	"y": 3900,
+	"wires": []
+}, {
+	"id": "8080d15911dfcb30",
+	"type": "http request",
+	"z": "2e669a42b2ecf4d5",
+	"name": "寻车闪灯",
+	"method": "GET",
+	"ret": "obj",
+	"paytoqs": "ignore",
+	"url": "",
+	"tls": "",
+	"persist": false,
+	"proxy": "",
+	"authType": "",
+	"x": 740,
+	"y": 4260,
+	"wires": [
+		["480a2d8a4c318b81", "836e100b2c708cc6"]
+	]
+}, {
+	"id": "1e2d525947d6ee24",
+	"type": "function",
+	"z": "2e669a42b2ecf4d5",
+	"name": "寻车闪灯请求头",
+	"func": "var tokenId = flow.get(\"tokenId\")\nvar CarSign = flow.get(\"CarSign\")\nvar pin = flow.get(\"pin\")\nvar vin = flow.get(\"vin\")\nmsg.headers = {\n    \"client\": \"phone\",\n    \"protocolVer\": \"2.1.2\",\n    \"v\": \"1.0\",\n    \"cid\": \"ffffffff-a1c9-c606-0000-000029b88992\",\n    \"ckey\": \"ea49a50f914b8d38af1c84809d302683\",\n    \"sign\": CarSign,\n    \"time\": msg.TimeStamp7,\n    \"token\": \"\",\n    \"Host\": \"ti.gwm.com.cn:8443\",\n    \"Connection\": \"Keep-Alive\",\n    \"User-Agent\": \"okhttp/4.2.2\"\n}\nmsg.url = \"https://ti.gwm.com.cn:8443/tsp/ead?p=%7B%22body%22%3A%7B%22cmdCode%22%3A%2220%22%2C%22flag%22%3A0%2C%22scyPwd%22%3A%22\"+pin+\"%22%2C%22userType%22%3A%220%22%2C%22vin%22%3A%22\"+vin+\"%22%7D%2C%22header%22%3A%7B%22brandType%22%3A%22Ora%22%2C%22cVer%22%3A%223.2.302%22%2C%22fn%22%3A%22GW.M.SEND_COMMON_COMMAND%22%2C%22fv%22%3A%220202%22%2C%22mobileId%22%3A%22ffffffff-a1c9-c606-0000-000029b88992%22%2C%22osType%22%3A%22Android%3ANOH-AN00%22%2C%22osVer%22%3A%227.1.2%22%2C%22rs%22%3A%222%22%2C%22ts%22%3A%2220211211111216574%22%2C%22tk%22%3A%22\"+tokenId+\"%22%2C%22v%22%3A%221.0%22%7D%7D\"\nreturn msg;",
+	"outputs": 1,
+	"noerr": 0,
+	"initialize": "",
+	"finalize": "",
+	"libs": [],
+	"x": 540,
+	"y": 4260,
+	"wires": [
+		["8080d15911dfcb30"]
+	]
+}, {
+	"id": "480a2d8a4c318b81",
+	"type": "debug",
+	"z": "2e669a42b2ecf4d5",
+	"name": "输出信息",
+	"active": true,
+	"tosidebar": true,
+	"console": false,
+	"tostatus": false,
+	"complete": "true",
+	"targetType": "full",
+	"statusVal": "",
+	"statusType": "auto",
+	"x": 940,
+	"y": 4300,
+	"wires": []
+}, {
+	"id": "d713f86b8922eb7d",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "获取时间",
+	"rules": [{
+		"t": "set",
+		"p": "TimeStamp7",
+		"pt": "msg",
+		"to": "",
+		"tot": "date"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 380,
+	"y": 4260,
+	"wires": [
+		["1e2d525947d6ee24"]
+	]
+}, {
+	"id": "d4e88387ebcb5206",
+	"type": "inject",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"props": [{
+		"p": "payload"
+	}, {
+		"p": "topic",
+		"vt": "str"
+	}],
+	"repeat": "",
+	"crontab": "",
+	"once": false,
+	"onceDelay": 0.1,
+	"topic": "",
+	"payload": "",
+	"payloadType": "date",
+	"x": 220,
+	"y": 4260,
+	"wires": [
+		["d713f86b8922eb7d"]
+	]
+}, {
+	"id": "5eea5d0936fe479c",
+	"type": "comment",
+	"z": "2e669a42b2ecf4d5",
+	"name": "寻车-闪灯",
+	"info": "",
+	"x": 200,
+	"y": 4140,
+	"wires": []
+}, {
+	"id": "a99499a35e4e0afd",
+	"type": "http request",
+	"z": "2e669a42b2ecf4d5",
+	"name": "寻车闪灯鸣笛",
+	"method": "GET",
+	"ret": "obj",
+	"paytoqs": "ignore",
+	"url": "",
+	"tls": "",
+	"persist": false,
+	"proxy": "",
+	"authType": "",
+	"x": 740,
+	"y": 4480,
+	"wires": [
+		["0b4088816416b577", "51592c0fdf4a0681"]
+	]
+}, {
+	"id": "b9c49170f21d07ba",
+	"type": "function",
+	"z": "2e669a42b2ecf4d5",
+	"name": "寻车闪灯鸣笛请求头",
+	"func": "var tokenId = flow.get(\"tokenId\")\nvar CarSign = flow.get(\"CarSign\")\nvar pin = flow.get(\"pin\")\nvar vin = flow.get(\"vin\")\nmsg.headers = {\n    \"client\": \"phone\",\n    \"protocolVer\": \"2.1.2\",\n    \"v\": \"1.0\",\n    \"cid\": \"ffffffff-a1c9-c606-0000-000029b88992\",\n    \"ckey\": \"ea49a50f914b8d38af1c84809d302683\",\n    \"sign\": CarSign,\n    \"time\": msg.TimeStamp8,\n    \"token\": \"\",\n    \"Host\": \"ti.gwm.com.cn:8443\",\n    \"Connection\": \"Keep-Alive\",\n    \"User-Agent\": \"okhttp/4.2.2\"\n}\nmsg.url = \"https://ti.gwm.com.cn:8443/tsp/ead?p=%7B%22body%22%3A%7B%22cmdCode%22%3A%225%22%2C%22flag%22%3A0%2C%22scyPwd%22%3A%22\"+pin+\"%22%2C%22userType%22%3A%220%22%2C%22vin%22%3A%22\"+vin+\"%22%7D%2C%22header%22%3A%7B%22brandType%22%3A%22Ora%22%2C%22cVer%22%3A%223.2.302%22%2C%22fn%22%3A%22GW.M.SEND_COMMON_COMMAND%22%2C%22fv%22%3A%220202%22%2C%22mobileId%22%3A%22ffffffff-a1c9-c606-0000-000029b88992%22%2C%22osType%22%3A%22Android%3ANOH-AN00%22%2C%22osVer%22%3A%227.1.2%22%2C%22rs%22%3A%222%22%2C%22ts%22%3A%2220211211111216574%22%2C%22tk%22%3A%22\"+tokenId+\"%22%2C%22v%22%3A%221.0%22%7D%7D\"\nreturn msg;",
+	"outputs": 1,
+	"noerr": 0,
+	"initialize": "",
+	"finalize": "",
+	"libs": [],
+	"x": 550,
+	"y": 4480,
+	"wires": [
+		["a99499a35e4e0afd"]
+	]
+}, {
+	"id": "0b4088816416b577",
+	"type": "debug",
+	"z": "2e669a42b2ecf4d5",
+	"name": "输出信息",
+	"active": true,
+	"tosidebar": true,
+	"console": false,
+	"tostatus": false,
+	"complete": "true",
+	"targetType": "full",
+	"statusVal": "",
+	"statusType": "auto",
+	"x": 940,
+	"y": 4540,
+	"wires": []
+}, {
+	"id": "0aac19affba0ec98",
+	"type": "change",
+	"z": "2e669a42b2ecf4d5",
+	"name": "获取时间",
+	"rules": [{
+		"t": "set",
+		"p": "TimeStamp8",
+		"pt": "msg",
+		"to": "",
+		"tot": "date"
+	}],
+	"action": "",
+	"property": "",
+	"from": "",
+	"to": "",
+	"reg": false,
+	"x": 370,
+	"y": 4480,
+	"wires": [
+		["b9c49170f21d07ba"]
+	]
+}, {
+	"id": "89d1d621ee50eda7",
+	"type": "inject",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"props": [{
+		"p": "payload"
+	}, {
+		"p": "topic",
+		"vt": "str"
+	}],
+	"repeat": "",
+	"crontab": "",
+	"once": false,
+	"onceDelay": 0.1,
+	"topic": "",
+	"payload": "",
+	"payloadType": "date",
+	"x": 210,
+	"y": 4480,
+	"wires": [
+		["0aac19affba0ec98"]
+	]
+}, {
+	"id": "cb8cff2f4cbff05b",
+	"type": "comment",
+	"z": "2e669a42b2ecf4d5",
+	"name": "寻车-闪灯鸣笛",
+	"info": "",
+	"x": 210,
+	"y": 4360,
+	"wires": []
+}, {
+	"id": "985963808a79b920",
+	"type": "delay",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"pauseType": "delay",
+	"timeout": "2",
+	"timeoutUnits": "seconds",
+	"rate": "1",
+	"nbRateUnits": "1",
+	"rateUnits": "second",
+	"randomFirst": "1",
+	"randomLast": "5",
+	"randomUnits": "seconds",
+	"drop": false,
+	"allowrate": false,
+	"outputs": 1,
+	"x": 360,
+	"y": 3280,
+	"wires": [
+		["03d87c559e878916"]
+	]
+}, {
+	"id": "03d87c559e878916",
+	"type": "api-call-service",
+	"z": "2e669a42b2ecf4d5",
+	"name": "2秒自动关闭按钮",
+	"server": "6b9343d6.6f2ffc",
+	"version": 5,
+	"debugenabled": false,
+	"domain": "input_boolean",
+	"service": "turn_off",
+	"areaId": [],
+	"deviceId": [],
+	"entityId": ["input_boolean.ora_lockdoor"],
+	"data": "",
+	"dataType": "jsonata",
+	"mergeContext": "",
+	"mustacheAltTags": false,
+	"outputProperties": [],
+	"queue": "none",
+	"x": 550,
+	"y": 3280,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "c5f0aad3ef2ce4ca",
+	"type": "server-state-changed",
+	"z": "2e669a42b2ecf4d5",
+	"name": "锁闭欧拉车门",
+	"server": "6b9343d6.6f2ffc",
+	"version": 4,
+	"exposeToHomeAssistant": false,
+	"haConfig": [{
+		"property": "name",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": ""
+	}],
+	"entityidfilter": "input_boolean.ora_lockdoor",
+	"entityidfiltertype": "exact",
+	"outputinitially": false,
+	"state_type": "str",
+	"haltifstate": "on",
+	"halt_if_type": "str",
+	"halt_if_compare": "is",
+	"outputs": 2,
+	"output_only_on_state_change": true,
+	"for": 0,
+	"forType": "num",
+	"forUnits": "minutes",
+	"ignorePrevStateNull": false,
+	"ignorePrevStateUnknown": false,
+	"ignorePrevStateUnavailable": false,
+	"ignoreCurrentStateUnknown": false,
+	"ignoreCurrentStateUnavailable": false,
+	"outputProperties": [{
+		"property": "button",
+		"propertyType": "msg",
+		"value": "",
+		"valueType": "entityState"
+	}],
+	"x": 190,
+	"y": 3280,
+	"wires": [
+		["985963808a79b920", "57c757c203c8182c"],
+		[]
+	]
+}, {
+	"id": "67a86afd42deef35",
+	"type": "delay",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"pauseType": "delay",
+	"timeout": "2",
+	"timeoutUnits": "seconds",
+	"rate": "1",
+	"nbRateUnits": "1",
+	"rateUnits": "second",
+	"randomFirst": "1",
+	"randomLast": "5",
+	"randomUnits": "seconds",
+	"drop": false,
+	"allowrate": false,
+	"outputs": 1,
+	"x": 420,
+	"y": 3540,
+	"wires": [
+		["2ce44e4a0e31ea2c"]
+	]
+}, {
+	"id": "2ce44e4a0e31ea2c",
+	"type": "api-call-service",
+	"z": "2e669a42b2ecf4d5",
+	"name": "2秒自动关闭按钮",
+	"server": "6b9343d6.6f2ffc",
+	"version": 5,
+	"debugenabled": false,
+	"domain": "input_boolean",
+	"service": "turn_off",
+	"areaId": [],
+	"deviceId": [],
+	"entityId": ["input_boolean.ora_unlockdoor"],
+	"data": "",
+	"dataType": "jsonata",
+	"mergeContext": "",
+	"mustacheAltTags": false,
+	"outputProperties": [],
+	"queue": "none",
+	"x": 590,
+	"y": 3540,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "21044ee444f6af46",
+	"type": "server-state-changed",
+	"z": "2e669a42b2ecf4d5",
+	"name": "解锁欧拉车门",
+	"server": "6b9343d6.6f2ffc",
+	"version": 4,
+	"exposeToHomeAssistant": false,
+	"haConfig": [{
+		"property": "name",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": ""
+	}],
+	"entityidfilter": "input_boolean.ora_unlockdoor",
+	"entityidfiltertype": "exact",
+	"outputinitially": false,
+	"state_type": "str",
+	"haltifstate": "on",
+	"halt_if_type": "str",
+	"halt_if_compare": "is",
+	"outputs": 2,
+	"output_only_on_state_change": true,
+	"for": 0,
+	"forType": "num",
+	"forUnits": "minutes",
+	"ignorePrevStateNull": false,
+	"ignorePrevStateUnknown": false,
+	"ignorePrevStateUnavailable": false,
+	"ignoreCurrentStateUnknown": false,
+	"ignoreCurrentStateUnavailable": false,
+	"outputProperties": [{
+		"property": "button",
+		"propertyType": "msg",
+		"value": "",
+		"valueType": "entityState"
+	}],
+	"x": 210,
+	"y": 3540,
+	"wires": [
+		["67a86afd42deef35", "600474fb929934ba"],
+		[]
+	]
+}, {
+	"id": "c0011a37e8eeefcb",
+	"type": "delay",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"pauseType": "delay",
+	"timeout": "2",
+	"timeoutUnits": "seconds",
+	"rate": "1",
+	"nbRateUnits": "1",
+	"rateUnits": "second",
+	"randomFirst": "1",
+	"randomLast": "5",
+	"randomUnits": "seconds",
+	"drop": false,
+	"allowrate": false,
+	"outputs": 1,
+	"x": 360,
+	"y": 3760,
+	"wires": [
+		["b5a38f02296a5463"]
+	]
+}, {
+	"id": "b5a38f02296a5463",
+	"type": "api-call-service",
+	"z": "2e669a42b2ecf4d5",
+	"name": "2秒自动关闭按钮",
+	"server": "6b9343d6.6f2ffc",
+	"version": 5,
+	"debugenabled": false,
+	"domain": "input_boolean",
+	"service": "turn_off",
+	"areaId": [],
+	"deviceId": [],
+	"entityId": ["input_boolean.ora_openaircondition"],
+	"data": "",
+	"dataType": "jsonata",
+	"mergeContext": "",
+	"mustacheAltTags": false,
+	"outputProperties": [],
+	"queue": "none",
+	"x": 530,
+	"y": 3760,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "7c303159238d8f86",
+	"type": "server-state-changed",
+	"z": "2e669a42b2ecf4d5",
+	"name": "开启空调",
+	"server": "6b9343d6.6f2ffc",
+	"version": 4,
+	"exposeToHomeAssistant": false,
+	"haConfig": [{
+		"property": "name",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": ""
+	}],
+	"entityidfilter": "input_boolean.ora_openaircondition",
+	"entityidfiltertype": "exact",
+	"outputinitially": false,
+	"state_type": "str",
+	"haltifstate": "on",
+	"halt_if_type": "str",
+	"halt_if_compare": "is",
+	"outputs": 2,
+	"output_only_on_state_change": true,
+	"for": 0,
+	"forType": "num",
+	"forUnits": "minutes",
+	"ignorePrevStateNull": false,
+	"ignorePrevStateUnknown": false,
+	"ignorePrevStateUnavailable": false,
+	"ignoreCurrentStateUnknown": false,
+	"ignoreCurrentStateUnavailable": false,
+	"outputProperties": [{
+		"property": "button",
+		"propertyType": "msg",
+		"value": "",
+		"valueType": "entityState"
+	}],
+	"x": 200,
+	"y": 3760,
+	"wires": [
+		["c0011a37e8eeefcb", "27f6cad7d8d68da7"],
+		[]
+	]
+}, {
+	"id": "2d359bdd23d29c21",
+	"type": "delay",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"pauseType": "delay",
+	"timeout": "2",
+	"timeoutUnits": "seconds",
+	"rate": "1",
+	"nbRateUnits": "1",
+	"rateUnits": "second",
+	"randomFirst": "1",
+	"randomLast": "5",
+	"randomUnits": "seconds",
+	"drop": false,
+	"allowrate": false,
+	"outputs": 1,
+	"x": 380,
+	"y": 3960,
+	"wires": [
+		["146119e4f1b3a146"]
+	]
+}, {
+	"id": "146119e4f1b3a146",
+	"type": "api-call-service",
+	"z": "2e669a42b2ecf4d5",
+	"name": "2秒自动关闭按钮",
+	"server": "6b9343d6.6f2ffc",
+	"version": 5,
+	"debugenabled": false,
+	"domain": "input_boolean",
+	"service": "turn_off",
+	"areaId": [],
+	"deviceId": [],
+	"entityId": ["input_boolean.ora_closeaircondition"],
+	"data": "",
+	"dataType": "jsonata",
+	"mergeContext": "",
+	"mustacheAltTags": false,
+	"outputProperties": [],
+	"queue": "none",
+	"x": 550,
+	"y": 3960,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "7766a17f2f87f177",
+	"type": "server-state-changed",
+	"z": "2e669a42b2ecf4d5",
+	"name": "关闭空调",
+	"server": "6b9343d6.6f2ffc",
+	"version": 4,
+	"exposeToHomeAssistant": false,
+	"haConfig": [{
+		"property": "name",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": ""
+	}],
+	"entityidfilter": "input_boolean.ora_closeaircondition",
+	"entityidfiltertype": "exact",
+	"outputinitially": false,
+	"state_type": "str",
+	"haltifstate": "on",
+	"halt_if_type": "str",
+	"halt_if_compare": "is",
+	"outputs": 2,
+	"output_only_on_state_change": true,
+	"for": 0,
+	"forType": "num",
+	"forUnits": "minutes",
+	"ignorePrevStateNull": false,
+	"ignorePrevStateUnknown": false,
+	"ignorePrevStateUnavailable": false,
+	"ignoreCurrentStateUnknown": false,
+	"ignoreCurrentStateUnavailable": false,
+	"outputProperties": [{
+		"property": "button",
+		"propertyType": "msg",
+		"value": "",
+		"valueType": "entityState"
+	}],
+	"x": 200,
+	"y": 3960,
+	"wires": [
+		["2d359bdd23d29c21", "6d7b8569515f439d"],
+		[]
+	]
+}, {
+	"id": "d2cc0368d8a15ee3",
+	"type": "delay",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"pauseType": "delay",
+	"timeout": "2",
+	"timeoutUnits": "seconds",
+	"rate": "1",
+	"nbRateUnits": "1",
+	"rateUnits": "second",
+	"randomFirst": "1",
+	"randomLast": "5",
+	"randomUnits": "seconds",
+	"drop": false,
+	"allowrate": false,
+	"outputs": 1,
+	"x": 360,
+	"y": 4200,
+	"wires": [
+		["20bd43c22faf83bf"]
+	]
+}, {
+	"id": "20bd43c22faf83bf",
+	"type": "api-call-service",
+	"z": "2e669a42b2ecf4d5",
+	"name": "2秒自动关闭按钮",
+	"server": "6b9343d6.6f2ffc",
+	"version": 5,
+	"debugenabled": false,
+	"domain": "input_boolean",
+	"service": "turn_off",
+	"areaId": [],
+	"deviceId": [],
+	"entityId": ["input_boolean.ora_searchcar_light"],
+	"data": "",
+	"dataType": "jsonata",
+	"mergeContext": "",
+	"mustacheAltTags": false,
+	"outputProperties": [],
+	"queue": "none",
+	"x": 530,
+	"y": 4200,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "b5d8816367fc54a1",
+	"type": "server-state-changed",
+	"z": "2e669a42b2ecf4d5",
+	"name": "寻车闪灯",
+	"server": "6b9343d6.6f2ffc",
+	"version": 4,
+	"exposeToHomeAssistant": false,
+	"haConfig": [{
+		"property": "name",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": ""
+	}],
+	"entityidfilter": "input_boolean.ora_searchcar_light",
+	"entityidfiltertype": "exact",
+	"outputinitially": false,
+	"state_type": "str",
+	"haltifstate": "on",
+	"halt_if_type": "str",
+	"halt_if_compare": "is",
+	"outputs": 2,
+	"output_only_on_state_change": true,
+	"for": 0,
+	"forType": "num",
+	"forUnits": "minutes",
+	"ignorePrevStateNull": false,
+	"ignorePrevStateUnknown": false,
+	"ignorePrevStateUnavailable": false,
+	"ignoreCurrentStateUnknown": false,
+	"ignoreCurrentStateUnavailable": false,
+	"outputProperties": [{
+		"property": "button",
+		"propertyType": "msg",
+		"value": "",
+		"valueType": "entityState"
+	}],
+	"x": 200,
+	"y": 4200,
+	"wires": [
+		["d2cc0368d8a15ee3", "d713f86b8922eb7d"],
+		[]
+	]
+}, {
+	"id": "4c45278201cb19e8",
+	"type": "delay",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"pauseType": "delay",
+	"timeout": "2",
+	"timeoutUnits": "seconds",
+	"rate": "1",
+	"nbRateUnits": "1",
+	"rateUnits": "second",
+	"randomFirst": "1",
+	"randomLast": "5",
+	"randomUnits": "seconds",
+	"drop": false,
+	"allowrate": false,
+	"outputs": 1,
+	"x": 380,
+	"y": 4420,
+	"wires": [
+		["322add12a4d5f8d9"]
+	]
+}, {
+	"id": "322add12a4d5f8d9",
+	"type": "api-call-service",
+	"z": "2e669a42b2ecf4d5",
+	"name": "2秒自动关闭按钮",
+	"server": "6b9343d6.6f2ffc",
+	"version": 5,
+	"debugenabled": false,
+	"domain": "input_boolean",
+	"service": "turn_off",
+	"areaId": [],
+	"deviceId": [],
+	"entityId": ["input_boolean.ora_searchcar_lightandwhistle"],
+	"data": "",
+	"dataType": "jsonata",
+	"mergeContext": "",
+	"mustacheAltTags": false,
+	"outputProperties": [],
+	"queue": "none",
+	"x": 570,
+	"y": 4420,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "8b9380c4827870c0",
+	"type": "server-state-changed",
+	"z": "2e669a42b2ecf4d5",
+	"name": "寻车闪灯鸣笛",
+	"server": "6b9343d6.6f2ffc",
+	"version": 4,
+	"exposeToHomeAssistant": false,
+	"haConfig": [{
+		"property": "name",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": ""
+	}],
+	"entityidfilter": "input_boolean.ora_searchcar_lightandwhistle",
+	"entityidfiltertype": "exact",
+	"outputinitially": false,
+	"state_type": "str",
+	"haltifstate": "on",
+	"halt_if_type": "str",
+	"halt_if_compare": "is",
+	"outputs": 2,
+	"output_only_on_state_change": true,
+	"for": 0,
+	"forType": "num",
+	"forUnits": "minutes",
+	"ignorePrevStateNull": false,
+	"ignorePrevStateUnknown": false,
+	"ignorePrevStateUnavailable": false,
+	"ignoreCurrentStateUnknown": false,
+	"ignoreCurrentStateUnavailable": false,
+	"outputProperties": [{
+		"property": "button",
+		"propertyType": "msg",
+		"value": "",
+		"valueType": "entityState"
+	}],
+	"x": 210,
+	"y": 4420,
+	"wires": [
+		["4c45278201cb19e8", "0aac19affba0ec98"],
+		[]
+	]
+}, {
+	"id": "283afaa3fbcbaa70",
+	"type": "delay",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"pauseType": "delay",
+	"timeout": "10",
+	"timeoutUnits": "seconds",
+	"rate": "1",
+	"nbRateUnits": "1",
+	"rateUnits": "second",
+	"randomFirst": "1",
+	"randomLast": "5",
+	"randomUnits": "seconds",
+	"drop": false,
+	"allowrate": false,
+	"outputs": 1,
+	"x": 920,
+	"y": 3340,
+	"wires": [
+		["4352616784ed5869"]
+	]
+}, {
+	"id": "b7cb5c98ba69304d",
+	"type": "delay",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"pauseType": "delay",
+	"timeout": "10",
+	"timeoutUnits": "seconds",
+	"rate": "1",
+	"nbRateUnits": "1",
+	"rateUnits": "second",
+	"randomFirst": "1",
+	"randomLast": "5",
+	"randomUnits": "seconds",
+	"drop": false,
+	"allowrate": false,
+	"outputs": 1,
+	"x": 920,
+	"y": 3580,
+	"wires": [
+		["793b9215f77f45fe"]
+	]
+}, {
+	"id": "4352616784ed5869",
+	"type": "link out",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"links": ["9b61fb0d9941850c", "5ebe4753561c8e22"],
+	"x": 1035,
+	"y": 3340,
+	"wires": []
+}, {
+	"id": "793b9215f77f45fe",
+	"type": "link out",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"links": ["9b61fb0d9941850c"],
+	"x": 1035,
+	"y": 3580,
+	"wires": []
+}, {
+	"id": "c3be80ad862d0982",
+	"type": "delay",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"pauseType": "delay",
+	"timeout": "10",
+	"timeoutUnits": "seconds",
+	"rate": "1",
+	"nbRateUnits": "1",
+	"rateUnits": "second",
+	"randomFirst": "1",
+	"randomLast": "5",
+	"randomUnits": "seconds",
+	"drop": false,
+	"allowrate": false,
+	"outputs": 1,
+	"x": 920,
+	"y": 3820,
+	"wires": [
+		["20c02ab70d47a74e"]
+	]
+}, {
+	"id": "20c02ab70d47a74e",
+	"type": "link out",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"links": ["9b61fb0d9941850c"],
+	"x": 1035,
+	"y": 3820,
+	"wires": []
+}, {
+	"id": "8303f706f1cf68b5",
+	"type": "delay",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"pauseType": "delay",
+	"timeout": "10",
+	"timeoutUnits": "seconds",
+	"rate": "1",
+	"nbRateUnits": "1",
+	"rateUnits": "second",
+	"randomFirst": "1",
+	"randomLast": "5",
+	"randomUnits": "seconds",
+	"drop": false,
+	"allowrate": false,
+	"outputs": 1,
+	"x": 940,
+	"y": 4020,
+	"wires": [
+		["55322f1d1e3ceacf"]
+	]
+}, {
+	"id": "55322f1d1e3ceacf",
+	"type": "link out",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"links": ["9b61fb0d9941850c"],
+	"x": 1045,
+	"y": 4020,
+	"wires": []
+}, {
+	"id": "836e100b2c708cc6",
+	"type": "delay",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"pauseType": "delay",
+	"timeout": "10",
+	"timeoutUnits": "seconds",
+	"rate": "1",
+	"nbRateUnits": "1",
+	"rateUnits": "second",
+	"randomFirst": "1",
+	"randomLast": "5",
+	"randomUnits": "seconds",
+	"drop": false,
+	"allowrate": false,
+	"outputs": 1,
+	"x": 920,
+	"y": 4260,
+	"wires": [
+		["2ee929387bf75ad6"]
+	]
+}, {
+	"id": "2ee929387bf75ad6",
+	"type": "link out",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"links": ["9b61fb0d9941850c"],
+	"x": 1035,
+	"y": 4260,
+	"wires": []
+}, {
+	"id": "51592c0fdf4a0681",
+	"type": "delay",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"pauseType": "delay",
+	"timeout": "10",
+	"timeoutUnits": "seconds",
+	"rate": "1",
+	"nbRateUnits": "1",
+	"rateUnits": "second",
+	"randomFirst": "1",
+	"randomLast": "5",
+	"randomUnits": "seconds",
+	"drop": false,
+	"allowrate": false,
+	"outputs": 1,
+	"x": 920,
+	"y": 4480,
+	"wires": [
+		["48ea1a1f6def11c9"]
+	]
+}, {
+	"id": "48ea1a1f6def11c9",
+	"type": "link out",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"links": ["9b61fb0d9941850c"],
+	"x": 1035,
+	"y": 4480,
+	"wires": []
+}, {
+	"id": "9b61fb0d9941850c",
+	"type": "link in",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"links": ["4352616784ed5869", "793b9215f77f45fe", "20c02ab70d47a74e", "55322f1d1e3ceacf", "2ee929387bf75ad6", "48ea1a1f6def11c9", "f63babb9e9b90d7f", "1d559ddf25c5b4f4", "dd421fe8d66a2a7f", "4a06b0834d18561d", "eaa4fadcca82529b", "a6669171fd6f426b", "c06792ffc8a8619d", "550ea1af6397aeb8", "c5b7d18c39bf763c", "2138b6755cfa89a5", "543127444c38d319", "28edda2445222572", "af73ee6157554a47", "093f19c892a20943", "f41818ee1e8cdcd5", "12193df1f238b45f", "3a5885af11b4e165", "b362b067e0650792", "b9b7ccf350be200a", "a21dcecc80dea5a3", "2afb176d6f379049", "9d532f4a17e4c9f5", "e04e4d4406fca28b", "bd1318da7ae96fde", "3372d9681abaf74f"],
+	"x": 375,
+	"y": 1540,
+	"wires": [
+		["7bf5da89b62783ce"]
+	]
+}, {
+	"id": "144cbd20929461df",
+	"type": "delay",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"pauseType": "delay",
+	"timeout": "2",
+	"timeoutUnits": "seconds",
+	"rate": "1",
+	"nbRateUnits": "1",
+	"rateUnits": "second",
+	"randomFirst": "1",
+	"randomLast": "5",
+	"randomUnits": "seconds",
+	"drop": false,
+	"allowrate": false,
+	"outputs": 1,
+	"x": 140,
+	"y": 1480,
+	"wires": [
+		["c0355203e785be5e"]
+	]
+}, {
+	"id": "c0355203e785be5e",
+	"type": "api-call-service",
+	"z": "2e669a42b2ecf4d5",
+	"name": "2秒自动关闭按钮",
+	"server": "6b9343d6.6f2ffc",
+	"version": 5,
+	"debugenabled": false,
+	"domain": "input_boolean",
+	"service": "turn_off",
+	"areaId": [],
+	"deviceId": [],
+	"entityId": ["input_boolean.ora_renew"],
+	"data": "",
+	"dataType": "jsonata",
+	"mergeContext": "",
+	"mustacheAltTags": false,
+	"outputProperties": [],
+	"queue": "none",
+	"x": 150,
+	"y": 1540,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "19cfcfd39327ca45",
+	"type": "delay",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"pauseType": "delay",
+	"timeout": "2",
+	"timeoutUnits": "seconds",
+	"rate": "1",
+	"nbRateUnits": "1",
+	"rateUnits": "second",
+	"randomFirst": "1",
+	"randomLast": "5",
+	"randomUnits": "seconds",
+	"drop": false,
+	"allowrate": false,
+	"outputs": 1,
+	"x": 120,
+	"y": 360,
+	"wires": [
+		["377b037aa3ec49f8"]
+	]
+}, {
+	"id": "377b037aa3ec49f8",
+	"type": "api-call-service",
+	"z": "2e669a42b2ecf4d5",
+	"name": "2秒自动关闭按钮",
+	"server": "6b9343d6.6f2ffc",
+	"version": 5,
+	"debugenabled": false,
+	"domain": "input_boolean",
+	"service": "turn_off",
+	"areaId": [],
+	"deviceId": [],
+	"entityId": ["input_boolean.ora_relogin"],
+	"data": "",
+	"dataType": "jsonata",
+	"mergeContext": "",
+	"mustacheAltTags": false,
+	"outputProperties": [],
+	"queue": "none",
+	"x": 150,
+	"y": 420,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "7aca9778267fe8c9",
+	"type": "http in",
+	"z": "2e669a42b2ecf4d5",
+	"name": "打开HA车辆界面自动更新车状态",
+	"url": "ora_renew",
+	"method": "get",
+	"upload": false,
+	"swaggerDoc": "",
+	"x": 150,
+	"y": 1620,
+	"wires": [
+		["12e0d0076d5ef08c", "82492e3011418416"]
+	]
+}, {
+	"id": "12e0d0076d5ef08c",
+	"type": "http response",
+	"z": "2e669a42b2ecf4d5",
+	"name": "反馈",
+	"statusCode": "200",
+	"headers": {},
+	"x": 170,
+	"y": 1740,
+	"wires": []
+}, {
+	"id": "82492e3011418416",
+	"type": "delay",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"pauseType": "rate",
+	"timeout": "5",
+	"timeoutUnits": "seconds",
+	"rate": "1",
+	"nbRateUnits": "2",
+	"rateUnits": "minute",
+	"randomFirst": "1",
+	"randomLast": "5",
+	"randomUnits": "seconds",
+	"drop": false,
+	"allowrate": false,
+	"outputs": 1,
+	"x": 180,
+	"y": 1680,
+	"wires": [
+		["7bf5da89b62783ce"]
+	]
+}, {
+	"id": "0f9c8e6d4e2f937c",
+	"type": "switch",
+	"z": "2e669a42b2ecf4d5",
+	"name": "更新信息正常才执行",
+	"property": "payload.header.m",
+	"propertyType": "msg",
+	"rules": [{
+		"t": "eq",
+		"v": "Success",
+		"vt": "str"
+	}, {
+		"t": "else"
+	}],
+	"checkall": "true",
+	"repair": false,
+	"outputs": 2,
+	"x": 1480,
+	"y": 2380,
+	"wires": [
+		["d7fcb06dfab922f2"],
+		["ceb07ee2423afc12"]
+	]
+}, {
+	"id": "9032799f3b8b601c",
+	"type": "inject",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"props": [{
+		"p": "payload"
+	}, {
+		"p": "topic",
+		"vt": "str"
+	}],
+	"repeat": "",
+	"crontab": "",
+	"once": false,
+	"onceDelay": 0.1,
+	"topic": "",
+	"payloadType": "str",
+	"x": 470,
+	"y": 1460,
+	"wires": [
+		["7bf5da89b62783ce"]
+	]
+}, {
+	"id": "10d5f59ed456af36",
+	"type": "ha-entity",
+	"z": "2e669a42b2ecf4d5",
+	"name": "欧拉剩余充电时间",
+	"server": "6b9343d6.6f2ffc",
+	"version": 2,
+	"debugenabled": false,
+	"outputs": 1,
+	"entityType": "sensor",
+	"config": [{
+		"property": "name",
+		"value": "欧拉剩余充电时间"
+	}, {
+		"property": "device_class",
+		"value": ""
+	}, {
+		"property": "icon",
+		"value": "mdi:camera-timer"
+	}, {
+		"property": "unit_of_measurement",
+		"value": "分钟"
+	}, {
+		"property": "state_class",
+		"value": ""
+	}, {
+		"property": "last_reset",
+		"value": ""
+	}],
+	"state": "payload.body.vehicleSts.battSts.chgTime",
+	"stateType": "msg",
+	"attributes": [],
+	"resend": true,
+	"outputLocation": "",
+	"outputLocationType": "none",
+	"inputOverride": "allow",
+	"outputOnStateChange": false,
+	"outputPayload": "$entity().state ? \"on\": \"off\"",
+	"outputPayloadType": "jsonata",
+	"x": 1990,
+	"y": 1120,
+	"wires": [
+		[]
+	]
+}, {
+	"id": "ceb07ee2423afc12",
+	"type": "link out",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"links": ["ba1e50db0c7df007", "967c425b1da9176e", "1234fe9b8ec2851a"],
+	"x": 1635,
+	"y": 2380,
+	"wires": []
+}, {
+	"id": "ba1e50db0c7df007",
+	"type": "link in",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"links": ["ceb07ee2423afc12"],
+	"x": 345,
+	"y": 220,
+	"wires": [
+		["d1fcc1fca6b00978"]
+	]
+}, {
+	"id": "1d559ddf25c5b4f4",
+	"type": "link out",
+	"z": "2e669a42b2ecf4d5",
+	"name": "",
+	"links": ["9b61fb0d9941850c"],
+	"x": 1605,
+	"y": 420,
+	"wires": []
+}, {
+	"id": "d5d4ac90b3258340",
+	"type": "comment",
+	"z": "2e669a42b2ecf4d5",
+	"name": "欧拉R1登录流",
+	"info": "",
+	"x": 130,
+	"y": 60,
+	"wires": []
+}, {
+	"id": "08b8d5e7b5f27c2c",
+	"type": "comment",
+	"z": "2e669a42b2ecf4d5",
+	"name": "欧拉R1控制车机流",
+	"info": "",
+	"x": 230,
+	"y": 3060,
+	"wires": []
+}, {
+	"id": "e89fa5872ef3b123",
+	"type": "md5",
+	"z": "2e669a42b2ecf4d5",
+	"name": "密码MD5加密",
+	"fieldToHash": "pin",
+	"fieldTypeToHash": "msg",
+	"hashField": "pin_md5",
+	"hashFieldType": "msg",
+	"x": 560,
+	"y": 3140,
+	"wires": [
+		["07ff45165978b42b", "c71eb6ce398c7030"]
+	]
+}, {
+	"id": "1e3eb3e7360158c7",
+	"type": "inject",
+	"z": "2e669a42b2ecf4d5",
+	"name": "PIN安防密码填入-输完执行注入后生效",
+	"props": [{
+		"p": "pin",
+		"v": "填写你的安防密码-输完执行注入后生效",
+		"vt": "str"
+	}, {
+		"p": "topic",
+		"vt": "str"
+	}],
+	"repeat": "",
+	"crontab": "",
+	"once": false,
+	"onceDelay": 0.1,
+	"topic": "",
+	"x": 230,
+	"y": 3140,
+	"wires": [
+		["e89fa5872ef3b123"]
+	]
+}, {
+	"id": "07ff45165978b42b",
+	"type": "debug",
+	"z": "2e669a42b2ecf4d5",
+	"name": "debug 19",
+	"active": true,
+	"tosidebar": true,
+	"console": false,
+	"tostatus": false,
+	"complete": "true",
+	"targetType": "full",
+	"statusVal": "",
+	"statusType": "auto",
+	"x": 800,
+	"y": 3200,
+	"wires": []
+}, {
+	"id": "c71eb6ce398c7030",
+	"type": "function",
+	"z": "2e669a42b2ecf4d5",
+	"name": "保存参数flow中",
+	"func": "flow.set(\"pin\", msg.pin_md5);",
+	"outputs": 0,
+	"noerr": 0,
+	"initialize": "",
+	"finalize": "",
+	"libs": [],
+	"x": 800,
+	"y": 3140,
+	"wires": []
+}, {
+	"id": "6b9343d6.6f2ffc",
+	"type": "server",
+	"name": "Home Assistant",
+	"version": 4,
+	"addon": true,
+	"rejectUnauthorizedCerts": true,
+	"ha_boolean": "y|yes|true|on|home|open",
+	"connectionDelay": true,
+	"cacheJson": true,
+	"heartbeat": false,
+	"heartbeatInterval": 30,
+	"areaSelector": "friendlyName",
+	"deviceSelector": "friendlyName",
+	"entitySelector": "friendlyName",
+	"statusSeparator": "at: ",
+	"statusYear": "hidden",
+	"statusMonth": "short",
+	"statusDay": "numeric",
+	"statusHourCycle": "h23",
+	"statusTimeFormat": "h:m"
+}, {
+	"id": "0922dd2da41f4cd7",
+	"type": "gaode-server",
+	"name": "默认高德key",
+	"gaodeKey": "f935d2e228651ce63169469df4469e8d"
+}, {
+	"id": "c3f6f41e16edc09c",
+	"type": "mqtt-broker",
+	"name": "",
+	"broker": "192.168.2.105",
+	"port": "1883",
+	"clientid": "ha_mqtt",
+	"autoConnect": true,
+	"usetls": false,
+	"protocolVersion": "4",
+	"keepalive": "60",
+	"cleansession": true,
+	"birthTopic": "",
+	"birthQos": "0",
+	"birthPayload": "",
+	"birthMsg": {},
+	"closeTopic": "",
+	"closeQos": "0",
+	"closePayload": "",
+	"closeMsg": {},
+	"willTopic": "",
+	"willQos": "0",
+	"willPayload": "",
+	"willMsg": {},
+	"sessionExpiry": ""
+}]
