@@ -7,8 +7,10 @@ var obj = JSON.parse($response.body);
 obj.data.user_id = "77666677";
 obj.data.vip_expire_time = 2130534427;
 obj.data.vip_show_expire_time = 2130534427;
-//obj.data.vip_current_type = 1;
-//obj.data.is_apple_receipt_user= true;
+obj.data.vip_current_type = 2;
+obj.data.vip_trial_day = 671932800;
+obj.data.is_apple_receipt_user= true;
+obj.data.vip_current_is_trial = true;
 $done({body: JSON.stringify(obj)});
 
 
